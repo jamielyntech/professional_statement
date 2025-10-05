@@ -337,22 +337,6 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                 image_bytes = base64.b64decode(character_photo)
                 
                 # v1 API img2img parameter structure  
-                files = {
-                    "init_image": ("reference.png", BytesIO(image_bytes), "image/png"),
-                    "options": (None, json.dumps({
-                        "text_prompts": [
-                            {"text": prompt, "weight": 1.0},
-                            {"text": negative_prompt, "weight": -1.0}
-                        ],
-                        "cfg_scale": 8,
-                        "image_strength": 0.4,  # 0.4 = 60% original image influence
-                        "samples": 1,
-                        "steps": 30,
-                        "height": 768,
-                        "width": 1344
-                    }))
-                }
-                
                 # Use correct Stability AI v1 img2img endpoint  
                 data = {
                     "text_prompts": [
