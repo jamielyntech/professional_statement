@@ -380,7 +380,7 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                 logging.warning(f"img2img error: {e}, falling back to text-only generation")
         
         # Fallback to text-only generation (existing logic)
-        return await generate_stability_ai_image_text_only(panel, style, jamie_desc, kylee_desc)
+        return generate_stability_ai_image_text_only(panel, style, jamie_desc, kylee_desc)
             
     except Exception as e:
         logging.error(f"Error generating Stability AI image for panel {panel.panel}: {str(e)}")
