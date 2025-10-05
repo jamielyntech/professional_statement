@@ -361,22 +361,28 @@ async def root():
 @api_router.get("/test-image")
 async def test_image_generation():
     """Test endpoint for image generation"""
+    simple_prompt = "A simple cartoon drawing of a magical crystal glowing in a forest"
+    
+    # Try direct OpenAI first
+    try:
+        image_bytes = await generate_image_direct_openai(simple_prompt)
+        if image_bytes:
+            return {"success": True, "method": "direct_openai", "image_size": len(image_bytes), "has_image": True}
+    except Exception as e:
+        logging.error(f"Direct OpenAI test failed: {e}")
+    
+    # Fallback to emergentintegrations
     try:
         image_gen = get_image_generator()
-        simple_prompt = "A simple cartoon drawing of a magical crystal glowing in a forest"
-        
-        images = await image_gen.generate_images(
-            prompt=simple_prompt
-        )
+        images = await image_gen.generate_images(prompt=simple_prompt)
         
         if images and len(images) > 0:
-            image_base64 = base64.b64encode(images[0]).decode('utf-8')
-            return {"success": True, "image_size": len(images[0]), "has_image": True}
+            return {"success": True, "method": "emergentintegrations", "image_size": len(images[0]), "has_image": True}
         else:
-            return {"success": False, "error": "No images generated"}
+            return {"success": False, "error": "No images generated from emergentintegrations"}
             
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": f"Both methods failed. Direct OpenAI and emergentintegrations: {str(e)}"}
 
 @api_router.post("/upload-character")
 async def upload_character(name: str, file: UploadFile = File(...)):
