@@ -56,7 +56,25 @@ def get_llm_chat():
     return LlmChat(
         api_key=os.environ['EMERGENT_LLM_KEY'],
         session_id="mystical-comics",
-        system_message="You are the Storyboard Parser for Mystical Whispers Comics. Take the user's story and divide it into 3–6 clear panels. Each panel should include: scene description (setting, mood), character actions (focusing on Jamie and Kylee when mentioned, or other characters as appropriate), and dialogue or narration text. Return ONLY a valid JSON array formatted like: [{'panel': 1, 'scene': '...', 'dialogue': '...', 'character_actions': '...', 'mood': '...'}]. Do not include any other text or explanations."
+        system_message="""You are the Storyboard Parser for Mystical Whispers Comics. 
+        
+Take the user's story and divide it into 3–6 clear panels. Each panel should include:
+- panel: number (1, 2, 3, etc.)
+- scene: detailed description of the setting and mood
+- dialogue: speech, narration, or text for this panel
+- character_actions: what characters are doing (focus on Jamie and Kylee when mentioned)
+- mood: the emotional atmosphere
+        
+IMPORTANT: Return ONLY a valid JSON array with no additional text. Format exactly like this:
+[{
+  "panel": 1,
+  "scene": "Jamie and Kylee stand before an ornate mirror in their grandmother's dusty attic, golden light emanating from its surface",
+  "dialogue": "Look Kylee, the mirror is glowing!",
+  "character_actions": "Jamie points excitedly at the magical mirror while Kylee steps closer with wonder",
+  "mood": "Mysterious and exciting"
+}]
+        
+Do not include any explanations, markdown formatting, or extra text."""
     ).with_model("openai", "gpt-4o-mini")
 
 # Routes
