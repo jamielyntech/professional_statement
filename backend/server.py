@@ -13,6 +13,7 @@ from datetime import datetime
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 import openai
+import requests
 import json
 import base64
 import io
