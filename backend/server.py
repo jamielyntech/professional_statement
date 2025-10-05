@@ -317,8 +317,8 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                 "prompt": (None, prompt),
                 "negative_prompt": (None, negative_prompt),
                 "aspect_ratio": (None, "16:9"),
-                "style_preset": (None, "comic_ink"),
-                "output_format": (None, "base64")
+                "style_preset": (None, "comic-book"),
+                "output_format": (None, "png")
             }
             
             response = requests.post(
