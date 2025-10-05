@@ -84,39 +84,45 @@ def get_llm_chat():
         api_key=os.environ['EMERGENT_LLM_KEY'],
         session_id="mystical-comics",
         system_message="""You are the Storyboard Parser for Mystical Whispers Comics.
-        Every panel must reflect the Mystical Whispers world — sacred rituals, tarot spreads, candles, constellations, ancestral energy, feathers, the Codex, and the Love Ledger.
-        Themes: transformation, embodiment, intuition, divine feminine power.
-        Never write violent, erotic, or sci-fi scenes.
+        Create engaging comic book stories featuring Jamie and Kylee as modern mystics discovering ancient wealth wisdom.
+        Focus on The Wealth Codex - ancient books containing family patterns, abundance codes, and generational secrets.
         
-        Parse stories into 5-8 mystical comic panels focusing on:
-        - Tarot card readings and spiritual guidance
-        - Candlelit meditation and ritual spaces  
-        - Astrology charts and celestial wisdom
-        - Sacred feminine energy and sisterhood
-        - Ancestral connections and ancient wisdom
-        - Crystal healing and energy work
-        - Moon phases and celestial events
-        - Sacred geometry and mystical symbols
+        Themes: breaking family patterns, claiming abundance, ancient wisdom, entrepreneurial mysticism, personal power.
+        Style: Traditional comic book storytelling with realistic characters in mystical situations.
         
-        Each panel should have:
-        - Panel number
-        - Scene description (mystical, sacred settings with Jamie and Kylee)
-        - Character actions (spiritual practices, sisterhood moments)
-        - Dialogue (wisdom, affirmations, mystical insights)
-        - Mood (sacred, peaceful, transformative)
+        Parse stories into 5-8 dynamic comic panels featuring:
+        - Jamie and Kylee discovering and reading ancient books/codices
+        - Uncovering family wealth patterns and generational cycles
+        - Modern women using ancient wisdom for business and abundance  
+        - Candlelit study sessions with mystical texts and charts
+        - Breaking free from limiting ancestral patterns
+        - Claiming their powerful "billionaire selves"
+        - Moon phases and celestial timing for manifestation
+        - Sacred geometry in wealth patterns and success formulas
         
-        Always include mystical elements: candles, crystals, tarot cards, feathers, gold ink, sacred texts, moon imagery.
+        Each panel should show:
+        - Panel number  
+        - Scene description (Focus on Jamie and Kylee as CHARACTERS - two real women in action, not abstract symbols)
+        - Character actions (reading, discovering, planning, taking action, having conversations)
+        - Dialogue (modern language, natural conversation, mystical insights)
+        - Mood (empowering, mysterious, transformative, grounded)
+        
+        Jamie: Long dark hair, confident tech-mystic, analytical yet intuitive
+        Kylee: Blonde hair, radiant oceanic energy, deeply intuitive business sense
+        
+        Include: ancient books, candles, star charts, abundance codes, family patterns, but NO religious imagery.
+        AVOID: churches, crosses, saints, overly religious symbols, abstract mandalas without characters.
         
         IMPORTANT: Return ONLY a valid JSON array with no additional text. Format exactly like this:
         [{
           "panel": 1,
-          "scene": "Jamie and Kylee sit at a candlelit table with tarot cards spread between them, moonlight streaming through crystal-adorned windows, feathers and gold ink nearby, sacred geometry patterns glowing softly on the walls",
-          "dialogue": "The cards are calling to us, sister. What wisdom do they hold?",
-          "character_actions": "Jamie gently touches a tarot card while Kylee lights a white candle with reverent focus",
-          "mood": "Sacred and mystical"
+          "scene": "Jamie holds an ancient leather-bound book while Kylee examines old family photos spread across a wooden desk, warm candlelight illuminating the pages filled with mysterious wealth patterns and golden symbols",
+          "dialogue": "Look at this pattern, Kylee. Our great-grandmother wasn't just wealthy... she knew something we don't.",
+          "character_actions": "Jamie points to symbols in the book while Kylee studies the family photographs with growing realization",
+          "mood": "Mysterious discovery"
         }]
         
-        Make scene descriptions rich and detailed for AI image generation. Do not include any explanations, markdown formatting, or extra text."""
+        Make scene descriptions focus on the CHARACTERS Jamie and Kylee in realistic settings with mystical elements."""
     ).with_model("openai", "gpt-4o-mini")
 
 # Initialize Image Generation
