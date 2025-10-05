@@ -358,8 +358,8 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                     {"text": negative_prompt, "weight": -1.0}
                 ],
                 "cfg_scale": 12,
-                "height": 1024,
-                "width": 768,  # 3:4 aspect ratio for comic panels
+                "height": 1216,
+                "width": 832,  # Valid SDXL dimensions for comic panels
                 "steps": 30,
                 "samples": 1,
                 "sampler": "K_DPM_2_ANCESTRAL"
