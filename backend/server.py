@@ -252,10 +252,24 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
             image_base64 = base64.b64encode(images[0]).decode('utf-8')
             return image_base64
         else:
+            # Fallback to placeholder if no images generated
+            logging.info(f"No images from emergentintegrations, using placeholder for panel {panel.panel}")
+            placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
+            if placeholder_bytes:
+                image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
+                return image_base64
             return None
             
     except Exception as e:
         logging.error(f"Error generating image for panel {panel.panel}: {str(e)}")
+        # Final fallback to placeholder
+        try:
+            placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
+            if placeholder_bytes:
+                image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
+                return image_base64
+        except Exception as placeholder_error:
+            logging.error(f"Even placeholder generation failed for panel {panel.panel}: {placeholder_error}")
         return None
 
 def create_speech_bubble(draw, text, x, y, max_width=200, font=None):
