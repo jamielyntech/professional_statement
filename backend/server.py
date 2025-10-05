@@ -521,10 +521,33 @@ def compress_image_for_storage(image_base64: str, max_size_mb: float = 1.5) -> s
         return image_base64  # Return original if compression fails
 
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
-    """Generate an AI image for a comic panel using Stability AI"""
+    """Generate an AI image for a comic panel using Stability AI with img2img when character photos available"""
     try:
-        # Try Stability AI first with character descriptions
-        image_base64 = generate_stability_ai_image(panel, style, jamie_desc, kylee_desc)
+        # Get character photos for img2img reference
+        jamie_photo, kylee_photo = await get_character_photos()
+        
+        # Determine which character photo to use based on panel content
+        reference_photo = None
+        panel_text = (panel.scene + " " + (panel.dialogue or "") + " " + (panel.character_actions or "")).lower()
+        
+        if jamie_photo and ("jamie" in panel_text):
+            reference_photo = jamie_photo
+            logging.info(f"Using Jamie photo for img2img reference in panel {panel.panel}")
+        elif kylee_photo and ("kylee" in panel_text):
+            reference_photo = kylee_photo
+            logging.info(f"Using Kylee photo for img2img reference in panel {panel.panel}")
+        elif jamie_photo and kylee_photo:
+            # If both characters mentioned or unclear, use Jamie as default
+            reference_photo = jamie_photo
+            logging.info(f"Using Jamie photo as default reference for panel {panel.panel}")
+        
+        # Try Stability AI with img2img if reference photo available, otherwise text-only
+        if reference_photo:
+            image_base64 = await generate_stability_ai_image_with_reference(panel, reference_photo, style, jamie_desc, kylee_desc)
+        else:
+            logging.info(f"No character photos available, using text-only generation for panel {panel.panel}")
+            image_base64 = generate_stability_ai_image_text_only(panel, style, jamie_desc, kylee_desc)
+        
         if image_base64:
             # Compress the image for storage to avoid MongoDB document size limits
             compressed_image = compress_image_for_storage(image_base64, max_size_mb=1.5)
