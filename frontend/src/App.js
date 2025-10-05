@@ -125,7 +125,7 @@ function App() {
             )}
           </div>
         ) : (
-          <ComicViewer 
+          <EnhancedComicViewer 
             comic={currentComic} 
             onNewStory={handleNewStory}
           />
