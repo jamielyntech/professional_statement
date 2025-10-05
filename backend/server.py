@@ -312,9 +312,10 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         logging.warning(f"Stability AI failed for panel {panel.panel}, using placeholder")
         
         # Fallback to placeholder if Stability AI fails
-        placeholder_bytes = await generate_placeholder_image(
+        placeholder_bytes = await generate_enhanced_comic_placeholder(
             f"{panel.scene} - {style} style with mystical colors", 
-            panel.panel
+            panel.panel,
+            style
         )
         if placeholder_bytes:
             image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
