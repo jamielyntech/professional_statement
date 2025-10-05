@@ -225,7 +225,7 @@ def create_comic_strip(panels: List[ComicPanel], title: str, aspect_ratio: str =
         try:
             title_font = ImageFont.load_default()
             text_font = ImageFont.load_default() 
-        except:
+        except Exception:
             title_font = None
             text_font = None
         
