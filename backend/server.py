@@ -295,22 +295,24 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             logging.error("STABILITY_API_KEY not found")
             return None
         
-        # Traditional comic book prompt with character references
+        # Comic book character-focused prompt
         prompt = f"""
-        A comic panel of Jamie and Kylee in the Mystical Whispers universe.
+        Traditional comic book panel featuring two women Jamie and Kylee.
         Scene: {panel.scene}
-        Style: traditional comic strip with watercolor ink texture and hand-drawn outlines.
-        Mood: mystical, soulful, and cinematic — tarot cards, candles, feathers, moonlight, stars, books, sacred symbols, not religious.
-        Setting: warm candlelight, celestial patterns, gentle magic.
-        Characters: Jamie and Kylee — real women, grounded, creative, and powerful.
-        Jamie: long dark hair, confident, tech-mystic energy.
-        Kylee: blonde hair, radiant, oceanic and intuitive.
-        Avoid religious imagery, crosses, angels, churches, or saints.
-        Use the Mystical Whispers color palette: magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
+        Art style: Classic comic book illustration with clean lineart and watercolor shading.
+        Characters are the main focus: Jamie (long dark hair, confident expression, modern clothes) and Kylee (blonde hair, warm smile, intuitive presence).
+        Both women are fully clothed in casual modern attire appropriate for the scene.
+        Setting: {panel.scene} with warm lighting, books, candles, mystical elements but grounded and realistic.
+        Comic book composition with speech bubbles and dynamic character poses.
+        Colors: magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
+        Focus on the two women characters, not abstract symbols or patterns.
         """
         
         negative_prompt = """
-        nsfw, naked, sexy, cleavage, church, priest, halo, saint, Jesus, cross, bible, crucifix, old testament, religious art, biblical, monk, nun, demon, satanic, horror, ugly hands, distorted faces, mandala, abstract patterns, geometric shapes only, no characters, blur, low quality
+        church, priest, halo, saint, Jesus, cross, bible, crucifix, religious art, biblical, monk, nun, cathedral, altar, prayer, worship,
+        mandala, abstract art, geometric patterns only, kaleidoscope, sacred geometry without characters, symbols only,
+        nsfw, naked, sexy, cleavage, revealing clothing, 
+        horror, ugly faces, distorted faces, extra limbs, deformed, blurry, low quality, amateur art
         """
         
         # Try DreamShaper XL v2beta API first
