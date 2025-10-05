@@ -107,52 +107,107 @@ def get_llm_chat():
 def get_image_generator():
     return OpenAIImageGeneration(api_key=os.environ['EMERGENT_LLM_KEY'])
 
-async def generate_placeholder_image(prompt: str, panel_number: int):
-    """Generate a placeholder comic panel image for demonstration"""
+async def generate_enhanced_comic_placeholder(prompt: str, panel_number: int, style: str = "Mystical Watercolor"):
+    """Generate an enhanced comic-style placeholder that looks like a real comic panel"""
     try:
-        # Create a 512x512 placeholder image
-        width, height = 512, 512
-        image = Image.new('RGB', (width, height), color='#f0fff7')
+        # Create a high-res image for comic quality
+        width, height = 800, 1000  # 4:5 aspect ratio
+        image = Image.new('RGB', (width, height), color='#f8f9fa')
         draw = ImageDraw.Draw(image)
         
-        # Draw mystical gradient background
+        # Create mystical gradient background
         for y in range(height):
             ratio = y / height
-            r = int(255 - ratio * 30)
-            g = int(240 + ratio * 15) 
-            b = int(247 - ratio * 20)
+            # Mystical gradient from light pink to light teal
+            r = int(255 - ratio * 15)  # Light pink to white
+            g = int(245 + ratio * 10)  # Maintain high values
+            b = int(250 - ratio * 5)   # Very light variation
+            
             for x in range(width):
-                image.putpixel((x, y), (r, g, b))
+                # Add slight horizontal variation for mystical effect
+                x_ratio = x / width
+                r_final = max(220, r - int(x_ratio * 10))
+                g_final = max(230, g - int(x_ratio * 5))
+                b_final = max(240, b - int(x_ratio * 5))
+                image.putpixel((x, y), (r_final, g_final, b_final))
         
         draw = ImageDraw.Draw(image)
         
-        # Draw mystical border
+        # Draw comic panel border
         border_color = '#e74285'
-        for i in range(5):
+        border_width = 6
+        for i in range(border_width):
             draw.rectangle([i, i, width-1-i, height-1-i], outline=border_color)
         
-        # Draw panel number
+        # Draw mystical elements
+        # Add floating crystals/gems
+        gem_color = '#20b69e'
+        for i in range(8):
+            gem_x = 100 + (i * 80)
+            gem_y = 50 + (i % 3) * 30
+            if gem_x < width - 50:
+                draw.ellipse([gem_x, gem_y, gem_x + 20, gem_y + 20], fill=gem_color, outline='#1a1330', width=2)
+        
+        # Add mystical stars
+        star_color = '#fcd94c'
+        for i in range(15):
+            star_x = (i * 47) % (width - 40) + 20
+            star_y = (i * 73) % (height - 40) + 20
+            draw.ellipse([star_x, star_y, star_x + 6, star_y + 6], fill=star_color, outline='#1a1330')
+        
+        # Draw central mystical scene area
+        scene_area = [50, 100, width-50, height-200]
+        draw.rectangle(scene_area, fill='rgba(255,255,255,0.8)', outline='#20b69e', width=3)
+        
         try:
             font = ImageFont.load_default()
         except Exception:
             font = None
             
         if font:
-            # Panel number badge
-            badge_size = 40
-            draw.ellipse([20, 20, 20 + badge_size, 20 + badge_size], fill='#e74285', outline='#1a1330', width=3)
-            draw.text((20 + badge_size//2, 20 + badge_size//2), str(panel_number), fill='white', font=font, anchor='mm')
+            # Panel number badge (larger and more prominent)
+            badge_size = 60
+            badge_x = width - badge_size - 20
+            badge_y = 20
+            draw.ellipse([badge_x, badge_y, badge_x + badge_size, badge_y + badge_size], 
+                        fill='#e74285', outline='#1a1330', width=4)
+            draw.text((badge_x + badge_size//2, badge_y + badge_size//2), 
+                     str(panel_number), fill='white', font=font, anchor='mm')
             
-            # Add scene text
-            scene_text = f"Panel {panel_number}: Mystical Scene"
-            draw.text((width//2, height//2 - 40), scene_text, fill='#1a1330', font=font, anchor='mm')
+            # Add "MYSTICAL COMIC PANEL" title
+            title_y = scene_area[1] + 20
+            draw.text((width//2, title_y), f"✨ {style} Comic Panel ✨", 
+                     fill='#1a1330', font=font, anchor='mm')
             
-            # Add prompt preview (truncated)
-            prompt_preview = prompt[:50] + "..." if len(prompt) > 50 else prompt
-            draw.text((width//2, height//2), prompt_preview, fill='#666', font=font, anchor='mm')
+            # Add scene description (word wrapped)
+            scene_lines = []
+            words = prompt.replace('\n', ' ').split()
+            current_line = []
+            chars_per_line = 35
             
-            # Add mystical elements
-            draw.text((width//2, height//2 + 40), "✨ Mystical Comic Panel ✨", fill='#20b69e', font=font, anchor='mm')
+            for word in words:
+                if len(' '.join(current_line + [word])) <= chars_per_line:
+                    current_line.append(word)
+                else:
+                    if current_line:
+                        scene_lines.append(' '.join(current_line))
+                    current_line = [word]
+            if current_line:
+                scene_lines.append(' '.join(current_line))
+            
+            # Draw scene text (max 6 lines)
+            text_y = title_y + 40
+            for i, line in enumerate(scene_lines[:6]):
+                draw.text((width//2, text_y + i * 20), line, fill='#333', font=font, anchor='mm')
+            
+            # Add Jamie and Kylee character placeholders
+            char_y = height - 150
+            draw.text((width//4, char_y), "👧 Jamie", fill='#e74285', font=font, anchor='mm')
+            draw.text((3*width//4, char_y), "👧 Kylee", fill='#20b69e', font=font, anchor='mm')
+            
+            # Add mystical footer
+            footer_text = "🔮 Awaiting Stability AI Credits for Real Artwork 🔮"
+            draw.text((width//2, height - 40), footer_text, fill='#666', font=font, anchor='mm')
         
         # Convert to bytes
         img_byte_arr = io.BytesIO()
@@ -160,7 +215,7 @@ async def generate_placeholder_image(prompt: str, panel_number: int):
         return img_byte_arr.getvalue()
         
     except Exception as e:
-        logging.error(f"Placeholder image generation failed: {e}")
+        logging.error(f"Enhanced placeholder generation failed: {e}")
         return None
 
 async def generate_image_direct_openai(prompt: str):
