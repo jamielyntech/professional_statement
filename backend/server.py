@@ -311,21 +311,23 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         horror, gore, distortion, church, priest, saint, biblical, mandala, abstract patterns only, blurry, low quality
         """
         
-        # Try Stability AI v2beta with enhanced parameters
+        # Try Stability AI v2beta with enhanced parameters and proper multipart format
         try:
+            files = {
+                "prompt": (None, prompt),
+                "negative_prompt": (None, negative_prompt),
+                "aspect_ratio": (None, "16:9"),
+                "style_preset": (None, "comic_ink"),
+                "output_format": (None, "base64")
+            }
+            
             response = requests.post(
                 "https://api.stability.ai/v2beta/stable-image/generate/core",
                 headers={
                     "Authorization": f"Bearer {api_key}",
                     "Accept": "application/json"
                 },
-                data={
-                    "prompt": prompt,
-                    "negative_prompt": negative_prompt,
-                    "aspect_ratio": "16:9",
-                    "style_preset": "comic_ink",
-                    "output_format": "base64"
-                },
+                files=files,
                 timeout=120
             )
             
