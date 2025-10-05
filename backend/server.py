@@ -340,7 +340,7 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                     "image": ("reference.png", BytesIO(image_bytes), "image/png"),
                     "prompt": (None, prompt),
                     "negative_prompt": (None, negative_prompt),
-                    "strength": (None, "0.75"),  # 0.7-0.8 range for character likeness
+                    "strength": (None, "0.6"),  # Lower strength = more like reference image
                     "aspect_ratio": (None, "16:9"),
                     "style_preset": (None, "comic-book"),
                     "output_format": (None, "png")
