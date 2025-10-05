@@ -133,7 +133,7 @@ async def generate_placeholder_image(prompt: str, panel_number: int):
         # Draw panel number
         try:
             font = ImageFont.load_default()
-        except:
+        except Exception:
             font = None
             
         if font:
