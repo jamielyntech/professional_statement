@@ -302,13 +302,60 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         logging.error(f"Error generating Stability AI image for panel {panel.panel}: {str(e)}")
         return None
 
+def compress_image_for_storage(image_base64: str, max_size_mb: float = 1.5) -> str:
+    """Compress base64 image for MongoDB storage while maintaining quality"""
+    try:
+        # Decode base64 to bytes
+        image_bytes = base64.b64decode(image_base64)
+        
+        # Load image with PIL
+        image = Image.open(BytesIO(image_bytes))
+        
+        # Start with high quality and reduce if needed
+        quality = 85
+        max_size_bytes = max_size_mb * 1024 * 1024
+        
+        while quality > 20:
+            # Convert to bytes with current quality
+            output_buffer = BytesIO()
+            image.save(output_buffer, format='JPEG', quality=quality, optimize=True)
+            compressed_bytes = output_buffer.getvalue()
+            
+            # Check if size is acceptable
+            if len(compressed_bytes) <= max_size_bytes:
+                compressed_base64 = base64.b64encode(compressed_bytes).decode('utf-8')
+                logging.info(f"Compressed image from {len(image_bytes)} to {len(compressed_bytes)} bytes at quality {quality}")
+                return compressed_base64
+            
+            quality -= 10
+        
+        # If still too large, resize image and try again
+        logging.warning("Image still too large after quality compression, resizing...")
+        original_size = image.size
+        new_size = (int(original_size[0] * 0.8), int(original_size[1] * 0.8))
+        image = image.resize(new_size, Image.Resampling.LANCZOS)
+        
+        output_buffer = BytesIO()
+        image.save(output_buffer, format='JPEG', quality=70, optimize=True)
+        compressed_bytes = output_buffer.getvalue()
+        compressed_base64 = base64.b64encode(compressed_bytes).decode('utf-8')
+        
+        logging.info(f"Final compressed image: {len(compressed_bytes)} bytes after resize from {original_size} to {new_size}")
+        return compressed_base64
+        
+    except Exception as e:
+        logging.error(f"Error compressing image: {e}")
+        return image_base64  # Return original if compression fails
+
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image for a comic panel using Stability AI"""
     try:
         # Try Stability AI first
         image_base64 = generate_stability_ai_image(panel, style)
         if image_base64:
-            return image_base64
+            # Compress the image for storage to avoid MongoDB document size limits
+            compressed_image = compress_image_for_storage(image_base64, max_size_mb=1.5)
+            return compressed_image
             
         logging.warning(f"Stability AI failed for panel {panel.panel}, using placeholder")
         
@@ -320,7 +367,9 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         )
         if placeholder_bytes:
             image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
-            return image_base64
+            # Compress placeholder too
+            compressed_image = compress_image_for_storage(image_base64, max_size_mb=1.0)
+            return compressed_image
             
         return None
             
