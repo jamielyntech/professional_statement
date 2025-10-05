@@ -331,8 +331,12 @@ async def parse_story(request: StoryRequest):
         # Generate images if requested
         if request.generate_images:
             for panel in panels:
-                image_base64 = await generate_panel_image(panel, request.style, jamie_desc, kylee_desc)
-                panel.image_base64 = image_base64
+                try:
+                    image_base64 = await generate_panel_image(panel, request.style, jamie_desc, kylee_desc)
+                    panel.image_base64 = image_base64
+                except Exception as img_error:
+                    logging.warning(f"Failed to generate image for panel {panel.panel}: {img_error}")
+                    panel.image_base64 = None
         
         # Create storyboard response
         storyboard = StoryboardResponse(
