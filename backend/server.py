@@ -81,7 +81,7 @@ def get_llm_chat():
         session_id="mystical-comics",
         system_message="""You are the Storyboard Parser for Mystical Whispers Comics. 
         
-        Take the user's story and divide it into 3–6 clear panels. Each panel should include:
+        Take the user's story and divide it into 5–10 clear panels for a detailed comic strip. Each panel should include:
         - panel: number (1, 2, 3, etc.)
         - scene: detailed visual description for AI image generation (include setting, lighting, mood, visual elements)
         - dialogue: speech, narration, or text for this panel
