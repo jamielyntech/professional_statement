@@ -164,12 +164,15 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
                 quality="standard"
             )
         except Exception as img_error:
-            logging.warning(f"Image generation failed for panel {panel.panel}, trying simplified call: {img_error}")
-            # Fallback with minimal parameters
+            logging.warning(f"Emergentintegrations failed for panel {panel.panel}, trying direct OpenAI: {img_error}")
+            # Fallback to direct OpenAI API
             try:
-                images = await image_gen.generate_images(
-                    prompt=prompt
-                )
+                image_bytes = await generate_image_direct_openai(prompt)
+                if image_bytes:
+                    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                    return image_base64
+                else:
+                    return None
             except Exception as fallback_error:
                 logging.error(f"All image generation failed for panel {panel.panel}: {fallback_error}")
                 return None
