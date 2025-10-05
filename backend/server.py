@@ -287,6 +287,26 @@ async def get_character_images():
         logging.error(f"Error retrieving character images: {e}")
         return None, None
 
+async def get_character_photos():
+    """Retrieve character photos for img2img reference"""
+    try:
+        characters = await db.characters.find().to_list(length=None)
+        jamie_photo = None
+        kylee_photo = None
+        
+        for char in characters:
+            if char['name'].lower() == 'jamie' and char.get('image_base64'):
+                jamie_photo = char['image_base64']
+                logging.info(f"Retrieved Jamie photo reference, length: {len(jamie_photo)}")
+            elif char['name'].lower() == 'kylee' and char.get('image_base64'):
+                kylee_photo = char['image_base64']
+                logging.info(f"Retrieved Kylee photo reference, length: {len(kylee_photo)}")
+        
+        return jamie_photo, kylee_photo
+    except Exception as e:
+        logging.error(f"Error retrieving character photos: {e}")
+        return None, None
+
 def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image using Stability AI DreamShaper XL with character references"""
     try:
