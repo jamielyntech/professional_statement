@@ -112,12 +112,12 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         
         # Create detailed prompt
         character_context = ""
-        if "jamie" in panel.scene.lower() or "jamie" in panel.character_actions.lower():
+        if "jamie" in panel.scene.lower() or (panel.character_actions and "jamie" in panel.character_actions.lower()):
             character_context += f" Jamie: {jamie_desc}."
-        if "kylee" in panel.scene.lower() or "kylee" in panel.character_actions.lower():
+        if "kylee" in panel.scene.lower() or (panel.character_actions and "kylee" in panel.character_actions.lower()):
             character_context += f" Kylee: {kylee_desc}."
         
-        prompt = f"""{panel.scene}. {panel.character_actions}. {character_context}
+        prompt = f"""{panel.scene}. {panel.character_actions or ''}. {character_context}
         
         Art style: {style}
         Mood: {panel.mood}
@@ -125,12 +125,20 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         Add watercolor glow effects and magical atmosphere.
         Comic book illustration style, detailed and vibrant."""
         
-        # Generate image
-        images = await image_gen.generate_images(
-            prompt=prompt,
-            model="gpt-image-1",
-            number_of_images=1
-        )
+        # Generate image with simpler call
+        try:
+            images = await image_gen.generate_images(
+                prompt=prompt,
+                number_of_images=1
+            )
+        except Exception as img_error:
+            logging.warning(f"Image generation failed for panel {panel.panel}, trying with dall-e-3: {img_error}")
+            # Fallback to dall-e-3
+            images = await image_gen.generate_images(
+                prompt=prompt,
+                model="dall-e-3",
+                number_of_images=1
+            )
         
         if images and len(images) > 0:
             # Convert to base64
