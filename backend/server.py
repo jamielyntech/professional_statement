@@ -336,14 +336,21 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                 # Decode base64 image and prepare for multipart upload
                 image_bytes = base64.b64decode(character_photo)
                 
+                # Correct parameter structure for v2beta/stable-image/transform
                 files = {
-                    "image": ("reference.png", BytesIO(image_bytes), "image/png"),
-                    "prompt": (None, prompt),
-                    "negative_prompt": (None, negative_prompt),
-                    "strength": (None, "0.6"),  # Lower strength = more like reference image
-                    "aspect_ratio": (None, "16:9"),
-                    "style_preset": (None, "comic-book"),
-                    "output_format": (None, "png")
+                    "init_image": ("reference.png", BytesIO(image_bytes), "image/png"),
+                    "params": (None, json.dumps({
+                        "text_prompts": [
+                            {"text": prompt, "weight": 1.0},
+                            {"text": negative_prompt, "weight": -1.0}
+                        ],
+                        "cfg_scale": 8,
+                        "init_image_mode": "IMAGE_STRENGTH",
+                        "image_strength": 0.4,  # 0.4 means 40% noise, 60% original image
+                        "samples": 1,
+                        "steps": 30,
+                        "style_preset": "comic-book"
+                    }))
                 }
                 
                 # Use the correct img2img transform endpoint
