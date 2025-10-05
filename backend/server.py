@@ -276,11 +276,13 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         {panel.scene}.
         Include Jamie and Kylee as the main characters in {style} style.
         Setting: mystical, sacred, candle-lit, tarot table, astrology charts, moonlight, feathers, gold ink.
-        Tone: soulful, feminine, spiritual, cinematic but modest.
-        Characters: Fully clothed in flowing, elegant, mystical clothing. Respectful poses, hands visible, modest necklines.
-        Avoid cleavage, nudity, sexual poses, or revealing clothing.
+        Tone: soulful, feminine, spiritual, cinematic but modest and family-friendly.
+        Characters: Fully covered in flowing robes, long sleeves, high necklines, elegant floor-length dresses or mystical cloaks.
+        Focus on faces, hands, and spiritual expressions. Respectful sitting or standing poses only.
+        Clothing: Modest mystical robes, covered arms and chest, appropriate spiritual attire, ceremonial garments.
         Use Mystical Whispers palette (magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330).
-        Soft watercolor lighting, ethereal glow, gentle emotion, portrait composition showing faces clearly.
+        Soft watercolor lighting, ethereal glow, gentle emotion, portrait composition showing faces and hands clearly.
+        Family-friendly, spiritual, sacred art with complete clothing coverage.
         """
         
         negative_prompt = """
