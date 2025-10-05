@@ -209,17 +209,17 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         Soft watercolor glow, cinematic tone.
         """
         
+        # Use multipart/form-data but expect binary response
         response = requests.post(
             "https://api.stability.ai/v2beta/stable-image/generate/sd3",
             headers={
                 "Authorization": f"Bearer {api_key}",
-                "Accept": "image/png",
-                "Content-Type": "application/json"
+                "Accept": "image/*"
             },
-            json={
-                "prompt": prompt,
-                "aspect_ratio": "4:5",
-                "output_format": "png"
+            files={
+                "prompt": (None, prompt),
+                "aspect_ratio": (None, "4:5"),
+                "output_format": (None, "png")
             },
             timeout=60
         )
