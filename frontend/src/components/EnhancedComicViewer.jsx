@@ -105,7 +105,7 @@ const EnhancedComicViewer = ({ comic, onNewStory }) => {
               <h3 className="panel-title ml-3">Panel {panel.panel}</h3>
             </div>
             
-            {/* AI Generated Image */}
+            {/* AI Generated Image with Comic Overlays */}
             {panel.image_base64 && (
               <div className="panel-image-container mb-4">
                 <img 
@@ -114,26 +114,20 @@ const EnhancedComicViewer = ({ comic, onNewStory }) => {
                   className="panel-image"
                   data-testid={`panel-${panel.panel}-image`}
                 />
-              </div>
-            )}
-            
-            {/* Scene Description */}
-            <div className="narration mb-4">
-              <strong>Scene:</strong> {panel.scene}
-              {panel.mood && (
-                <div className="text-sm mt-1 opacity-80">
-                  <strong>Mood:</strong> {panel.mood}
-                </div>
-              )}
-            </div>
-            
-            {/* Character Actions */}
-            {panel.character_actions && (
-              <div className="mb-3">
-                <div className="text-sm font-bold mb-1 text-gray-600">Actions:</div>
-                <div className="text-sm bg-purple-100 p-2 rounded border-l-4 border-purple-400">
-                  {panel.character_actions}
-                </div>
+                
+                {/* Character Actions Overlay (top) */}
+                {panel.character_actions && (
+                  <div className="comic-action-overlay">
+                    <strong>Action:</strong> {panel.character_actions}
+                  </div>
+                )}
+                
+                {/* Speech Bubble Overlay (bottom) */}
+                {panel.dialogue && (
+                  <div className="comic-speech-overlay">
+                    {panel.dialogue}
+                  </div>
+                )}
               </div>
             )}
             
@@ -149,12 +143,15 @@ const EnhancedComicViewer = ({ comic, onNewStory }) => {
               )}
             </div>
             
-            {/* Dialogue */}
-            {panel.dialogue && (
-              <div className="speech-bubble">
-                {panel.dialogue}
-              </div>
-            )}
+            {/* Scene Description (below image for reference) */}
+            <div className="text-sm text-gray-600 mb-2">
+              <strong>Scene:</strong> {panel.scene}
+              {panel.mood && (
+                <div className="mt-1">
+                  <strong>Mood:</strong> {panel.mood}
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>
