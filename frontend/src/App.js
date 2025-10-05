@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import StoryInput from './components/StoryInput';
-import ComicViewer from './components/ComicViewer';
+import CharacterUpload from './components/CharacterUpload';
+import EnhancedStoryInput from './components/EnhancedStoryInput';
+import EnhancedComicViewer from './components/EnhancedComicViewer';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
