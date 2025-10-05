@@ -336,6 +336,15 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                 # Decode base64 image and prepare for multipart upload
                 image_bytes = base64.b64decode(character_photo)
                 
+                # Resize image to SDXL compatible dimensions (1344x768 landscape)
+                pil_image = Image.open(BytesIO(image_bytes))
+                resized_image = pil_image.resize((1344, 768), Image.Resampling.LANCZOS)
+                
+                # Convert back to bytes
+                output_buffer = BytesIO()
+                resized_image.save(output_buffer, format='PNG')
+                image_bytes = output_buffer.getvalue()
+                
                 # v1 API img2img parameter structure  
                 # Use correct Stability AI v1 img2img endpoint - form data format
                 data = {
