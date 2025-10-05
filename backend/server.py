@@ -242,84 +242,28 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         return None
 
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
-    """Generate an AI image for a comic panel"""
+    """Generate an AI image for a comic panel using Stability AI"""
     try:
-        image_gen = get_image_generator()
-        
-        # Create detailed prompt
-        character_context = ""
-        if "jamie" in panel.scene.lower() or (panel.character_actions and "jamie" in panel.character_actions.lower()):
-            character_context += f" Jamie: {jamie_desc}."
-        if "kylee" in panel.scene.lower() or (panel.character_actions and "kylee" in panel.character_actions.lower()):
-            character_context += f" Kylee: {kylee_desc}."
-        
-        prompt = f"""{panel.scene}. {panel.character_actions or ''}. {character_context}
-        
-        Art style: {style}
-        Mood: {panel.mood}
-        Color palette: Mystical - magenta #e74285, teal #20b69e, gold #fcd94c, midnight navy #1a1330
-        Add watercolor glow effects and magical atmosphere.
-        Comic book illustration style, detailed and vibrant."""
-        
-        # Generate image with proper parameters
-        try:
-            images = await image_gen.generate_images(
-                prompt=prompt,
-                model="gpt-image-1",
-                number_of_images=1,
-                quality="standard"
-            )
-        except Exception as img_error:
-            logging.warning(f"Emergentintegrations failed for panel {panel.panel}, trying direct OpenAI: {img_error}")
-            # Fallback to direct OpenAI API
-            try:
-                image_bytes = await generate_image_direct_openai(prompt)
-                if image_bytes:
-                    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-                    return image_base64
-                else:
-                    # Final fallback to placeholder image
-                    logging.info(f"Using placeholder image for panel {panel.panel}")
-                    placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
-                    if placeholder_bytes:
-                        image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
-                        return image_base64
-                    return None
-            except Exception as fallback_error:
-                logging.error(f"Direct OpenAI failed for panel {panel.panel}, using placeholder: {fallback_error}")
-                # Final fallback to placeholder image
-                try:
-                    placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
-                    if placeholder_bytes:
-                        image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
-                        return image_base64
-                except Exception as placeholder_error:
-                    logging.error(f"Even placeholder generation failed for panel {panel.panel}: {placeholder_error}")
-                return None
-        
-        if images and len(images) > 0:
-            # Convert to base64
-            image_base64 = base64.b64encode(images[0]).decode('utf-8')
+        # Try Stability AI first
+        image_base64 = generate_stability_ai_image(panel, style)
+        if image_base64:
             return image_base64
-        else:
-            # Fallback to placeholder if no images generated
-            logging.info(f"No images from emergentintegrations, using placeholder for panel {panel.panel}")
-            placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
-            if placeholder_bytes:
-                image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
-                return image_base64
-            return None
+            
+        logging.warning(f"Stability AI failed for panel {panel.panel}, using placeholder")
+        
+        # Fallback to placeholder if Stability AI fails
+        placeholder_bytes = await generate_placeholder_image(
+            f"{panel.scene} - {style} style with mystical colors", 
+            panel.panel
+        )
+        if placeholder_bytes:
+            image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
+            return image_base64
+            
+        return None
             
     except Exception as e:
-        logging.error(f"Error generating image for panel {panel.panel}: {str(e)}")
-        # Final fallback to placeholder
-        try:
-            placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
-            if placeholder_bytes:
-                image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
-                return image_base64
-        except Exception as placeholder_error:
-            logging.error(f"Even placeholder generation failed for panel {panel.panel}: {placeholder_error}")
+        logging.error(f"Error in panel image generation for panel {panel.panel}: {str(e)}")
         return None
 
 def create_speech_bubble(draw, text, x, y, max_width=200, font=None):
