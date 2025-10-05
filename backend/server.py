@@ -248,24 +248,36 @@ async def generate_image_direct_openai(prompt: str):
         return None
 
 # Helper functions
-def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor"):
-    """Generate an AI image using Stability AI for a comic panel"""
+def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
+    """Generate an AI image using Stability AI for a comic panel with character descriptions"""
     try:
         api_key = os.getenv("STABILITY_API_KEY")
         if not api_key:
             logging.error("STABILITY_API_KEY not found")
             return None
             
-        # Create detailed prompt using your exact format
+        # Build character descriptions for the prompt
+        character_details = ""
+        if jamie_desc and "jamie" in panel.scene.lower():
+            character_details += f"Jamie: {jamie_desc}. "
+        if kylee_desc and "kylee" in panel.scene.lower():
+            character_details += f"Kylee: {kylee_desc}. "
+        
+        # If no specific character descriptions, use generic ones
+        if not character_details and ("jamie" in panel.scene.lower() or "kylee" in panel.scene.lower()):
+            character_details = "Jamie: young adventurous girl with curious bright eyes and shoulder-length hair. Kylee: wise companion with flowing hair and gentle mystical aura. "
+        
+        # Create enhanced detailed prompt
         prompt = f"""
         {panel.scene}
-        Include Jamie and Kylee in a {style} style.
-        Mystical Whispers color palette:
-        magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
-        Soft watercolor glow, cinematic tone.
+        {character_details}
+        Style: {style} with ethereal watercolor effects, soft magical lighting, dreamy atmosphere.
+        Color palette: mystical magenta #e74285, enchanted teal #20b69e, golden magic #fcd94c, deep navy #1a1330.
+        High quality digital art, cinematic composition, detailed character features, magical glow effects.
+        Avoid: cartoon style, low quality, blurry, distorted faces.
         """
         
-        # Try v1 API endpoint which may be more stable
+        # Enhanced API parameters for better quality
         response = requests.post(
             "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
             headers={
@@ -274,14 +286,18 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                 "Accept": "application/json"
             },
             json={
-                "text_prompts": [{"text": prompt}],
-                "cfg_scale": 7,
+                "text_prompts": [
+                    {"text": prompt, "weight": 1.0},
+                    {"text": "low quality, blurry, distorted, cartoon, anime, abstract", "weight": -0.5}
+                ],
+                "cfg_scale": 12,  # Higher for better prompt adherence
                 "height": 1024,
                 "width": 1024,
-                "steps": 20,
-                "samples": 1
+                "steps": 30,  # More steps for better quality
+                "samples": 1,
+                "sampler": "K_DPM_2_ANCESTRAL"  # Better sampler for artistic styles
             },
-            timeout=60
+            timeout=90  # Longer timeout for better quality
         )
         
         if response.status_code == 200:
