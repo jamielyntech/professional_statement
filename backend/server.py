@@ -378,7 +378,7 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
 
 def generate_stability_ai_image_text_only(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image using Stability AI text-to-image (original function)"""
-    """Generate an AI image using Stability AI DreamShaper XL with character references"""
+    """Generate an AI image using Stability AI text-to-image (original function)"""
     try:
         api_key = os.getenv("STABILITY_API_KEY")
         if not api_key:
