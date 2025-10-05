@@ -160,8 +160,19 @@ h3, .panel-title {
 /* Panel Grid */
 .panels-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .panels-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel-image-container {
+    height: 300px; /* Smaller on mobile */
+  }
 }
 
 .panel-item {
