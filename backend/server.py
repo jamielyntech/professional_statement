@@ -192,6 +192,55 @@ async def generate_image_direct_openai(prompt: str):
         return None
 
 # Helper functions
+def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor"):
+    """Generate an AI image using Stability AI for a comic panel"""
+    try:
+        api_key = os.getenv("STABILITY_API_KEY")
+        if not api_key:
+            logging.error("STABILITY_API_KEY not found")
+            return None
+            
+        # Create detailed prompt using your exact format
+        prompt = f"""
+        {panel.scene}
+        Include Jamie and Kylee in a {style} style.
+        Mystical Whispers color palette:
+        magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
+        Soft watercolor glow, cinematic tone.
+        """
+        
+        response = requests.post(
+            "https://api.stability.ai/v2beta/stable-image/generate/sd3",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            json={
+                "prompt": prompt,
+                "output_format": "png",
+                "aspect_ratio": "4:5"
+            },
+            timeout=60
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            image_base64 = data.get("image")
+            if image_base64:
+                logging.info(f"Successfully generated Stability AI image for panel {panel.panel}")
+                return image_base64
+            else:
+                logging.error(f"No image data in Stability AI response for panel {panel.panel}")
+                return None
+        else:
+            logging.error(f"Stability AI API error for panel {panel.panel}: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        logging.error(f"Error generating Stability AI image for panel {panel.panel}: {str(e)}")
+        return None
+
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image for a comic panel"""
     try:
