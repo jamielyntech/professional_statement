@@ -263,37 +263,80 @@ async def generate_image_direct_openai(prompt: str):
         return None
 
 # Helper functions
+async def get_character_images():
+    """Retrieve character images for reference"""
+    try:
+        characters = db.characters.find().to_list(length=None)
+        jamie_image = None
+        kylee_image = None
+        
+        for char in await characters:
+            if char['name'].lower() == 'jamie' and char.get('image_base64'):
+                jamie_image = char['image_base64']
+            elif char['name'].lower() == 'kylee' and char.get('image_base64'):
+                kylee_image = char['image_base64']
+        
+        return jamie_image, kylee_image
+    except Exception as e:
+        logging.error(f"Error retrieving character images: {e}")
+        return None, None
+
 def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
-    """Generate an AI image using Stability AI for a comic panel with character descriptions"""
+    """Generate an AI image using Stability AI DreamShaper XL with character references"""
     try:
         api_key = os.getenv("STABILITY_API_KEY")
         if not api_key:
             logging.error("STABILITY_API_KEY not found")
             return None
-            
-        # Enhanced mystical scene prompt with brand guidelines
+        
+        # Traditional comic book prompt with character references
         prompt = f"""
-        {panel.scene}.
-        Include Jamie and Kylee as the main characters in {style} style.
-        Setting: mystical, sacred, candle-lit, tarot table, astrology charts, moonlight, feathers, gold ink.
-        Tone: soulful, feminine, spiritual, cinematic but modest and family-friendly.
-        Characters: Fully covered in flowing robes, long sleeves, high necklines, elegant floor-length dresses or mystical cloaks.
-        Focus on faces, hands, and spiritual expressions. Respectful sitting or standing poses only.
-        Clothing: Modest mystical robes, covered arms and chest, appropriate spiritual attire, ceremonial garments.
-        Use Mystical Whispers palette (magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330).
-        Soft watercolor lighting, ethereal glow, gentle emotion, portrait composition showing faces and hands clearly.
-        Family-friendly, spiritual, sacred art with complete clothing coverage.
+        A comic panel of Jamie and Kylee in the Mystical Whispers universe.
+        Scene: {panel.scene}
+        Style: traditional comic strip with watercolor ink texture and hand-drawn outlines.
+        Mood: mystical, soulful, and cinematic — tarot cards, candles, feathers, moonlight, stars, books, sacred symbols, not religious.
+        Setting: warm candlelight, celestial patterns, gentle magic.
+        Characters: Jamie and Kylee — real women, grounded, creative, and powerful.
+        Jamie: long dark hair, confident, tech-mystic energy.
+        Kylee: blonde hair, radiant, oceanic and intuitive.
+        Avoid religious imagery, crosses, angels, churches, or saints.
+        Use the Mystical Whispers color palette: magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
         """
         
         negative_prompt = """
-        nsfw, naked, nude, sexy, suggestive, breasts, cleavage, butt, buttocks, legs, thighs, lingerie, fetish, violence, horror, gore,
-        low quality, distorted faces, cartoon, anime, abstract, blurry, cropped faces, partial bodies, revealing clothing,
-        sexual poses, inappropriate clothing, tight clothing, short skirts, tank tops, swimwear, bikini, underwear, bra,
-        exposed skin, bare shoulders, bare back, décolletage, provocative, seductive, alluring, erotic, adult content,
-        body parts, anatomy, flesh, skin exposure, revealing necklines, low cut, short dress, mini skirt, crop top
+        nsfw, naked, sexy, cleavage, church, priest, halo, saint, Jesus, cross, bible, crucifix, old testament, religious art, biblical, monk, nun, demon, satanic, horror, ugly hands, distorted faces, mandala, abstract patterns, geometric shapes only, no characters, blur, low quality
         """
         
-        # Enhanced API parameters for better quality and composition
+        # Try DreamShaper XL v2beta API first
+        try:
+            response = requests.post(
+                "https://api.stability.ai/v2beta/stable-image/generate/dreamshaper-xl",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Accept": "image/*"
+                },
+                files={
+                    "prompt": (None, prompt),
+                    "negative_prompt": (None, negative_prompt),
+                    "aspect_ratio": (None, "3:4"),
+                    "seed": (None, "0"),
+                    "output_format": (None, "png")
+                },
+                timeout=120
+            )
+            
+            if response.status_code == 200:
+                # Convert binary image to base64
+                image_base64 = base64.b64encode(response.content).decode('utf-8')
+                logging.info(f"Successfully generated DreamShaper XL image for panel {panel.panel}, base64 length: {len(image_base64)}")
+                return image_base64
+            else:
+                logging.warning(f"DreamShaper XL failed: {response.status_code}, falling back to SDXL")
+        
+        except Exception as e:
+            logging.warning(f"DreamShaper XL error: {e}, falling back to SDXL")
+        
+        # Fallback to SDXL v1 API
         response = requests.post(
             "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
             headers={
@@ -306,10 +349,10 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                     {"text": prompt, "weight": 1.0},
                     {"text": negative_prompt, "weight": -1.0}
                 ],
-                "cfg_scale": 15,  # Higher for better prompt adherence
-                "height": 832,  # Better aspect ratio for comic panels
-                "width": 1216,  # Landscape for better panel composition
-                "steps": 35,  # More steps for better quality
+                "cfg_scale": 12,
+                "height": 1024,
+                "width": 768,  # 3:4 aspect ratio for comic panels
+                "steps": 30,
                 "samples": 1,
                 "sampler": "K_DPM_2_ANCESTRAL"
             },
