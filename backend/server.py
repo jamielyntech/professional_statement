@@ -589,9 +589,9 @@ async def test_image_generation():
     
     # Test complete pipeline
     try:
-        # First test Stability AI directly with character descriptions
-        jamie_test_desc = "young adventurous girl with curious bright eyes and shoulder-length hair, confident expression"
-        kylee_test_desc = "wise companion with flowing hair and gentle mystical aura, kind thoughtful expression"
+        # First test Stability AI directly with enhanced character descriptions
+        jamie_test_desc = "spiritual guide with beautiful facial features, wearing modest mystical robes, hands holding crystals"
+        kylee_test_desc = "gentle mystical companion with soft features, flowing hair, surrounded by spiritual light"
         stability_result = generate_stability_ai_image(test_panel, "Mystical Watercolor", jamie_test_desc, kylee_test_desc)
         if stability_result:
             return {
