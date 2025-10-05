@@ -315,36 +315,7 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         horror, ugly faces, distorted faces, extra limbs, deformed, blurry, low quality, amateur art
         """
         
-        # Try DreamShaper XL v2beta API first
-        try:
-            response = requests.post(
-                "https://api.stability.ai/v2beta/stable-image/generate/dreamshaper-xl",
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Accept": "image/*"
-                },
-                files={
-                    "prompt": (None, prompt),
-                    "negative_prompt": (None, negative_prompt),
-                    "aspect_ratio": (None, "3:4"),
-                    "seed": (None, "0"),
-                    "output_format": (None, "png")
-                },
-                timeout=120
-            )
-            
-            if response.status_code == 200:
-                # Convert binary image to base64
-                image_base64 = base64.b64encode(response.content).decode('utf-8')
-                logging.info(f"Successfully generated DreamShaper XL image for panel {panel.panel}, base64 length: {len(image_base64)}")
-                return image_base64
-            else:
-                logging.warning(f"DreamShaper XL failed: {response.status_code}, falling back to SDXL")
-        
-        except Exception as e:
-            logging.warning(f"DreamShaper XL error: {e}, falling back to SDXL")
-        
-        # Fallback to SDXL v1 API
+        # Use SDXL v1 API with proper dimensions
         response = requests.post(
             "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
             headers={
