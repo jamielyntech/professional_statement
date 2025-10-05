@@ -234,10 +234,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Content Moderation System"
-    - "Mystical Theme Integration"
-    - "Character Reference System"
-    - "Enhanced Image Parameters"
+    - "Comic Layout System Backend Support"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
