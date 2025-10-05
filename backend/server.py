@@ -295,27 +295,55 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             logging.error("STABILITY_API_KEY not found")
             return None
         
-        # Comic book character-focused prompt
+        # Enhanced comic panel prompt with character references
         prompt = f"""
-        Traditional comic book panel featuring two women Jamie and Kylee.
+        Comic panel of Jamie and Kylee — two women standing side by side, confident and kind. 
         Scene: {panel.scene}
-        Art style: Classic comic book illustration with clean lineart and watercolor shading.
-        Characters are the main focus: Jamie (long dark hair, confident expression, modern clothes) and Kylee (blonde hair, warm smile, intuitive presence).
-        Both women are fully clothed in casual modern attire appropriate for the scene.
-        Setting: {panel.scene} with warm lighting, books, candles, mystical elements but grounded and realistic.
-        Comic book composition with speech bubbles and dynamic character poses.
+        Jamie: long dark hair, wavy style, teal clothing, tech-mystic energy. 
+        Kylee: golden-blonde hair, layered cut, warm clothing, intuitive presence.
+        Include full heads and shoulders, clean comic outlines, watercolor ink finish, teal and magenta palette, no cropping. 
+        Add speech bubbles with dialogue placeholders. Traditional comic book style with clean lineart.
         Colors: magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
-        Focus on the two women characters, not abstract symbols or patterns.
         """
         
         negative_prompt = """
-        church, priest, halo, saint, Jesus, cross, bible, crucifix, religious art, biblical, monk, nun, cathedral, altar, prayer, worship,
-        mandala, abstract art, geometric patterns only, kaleidoscope, sacred geometry without characters, symbols only,
-        nsfw, naked, sexy, cleavage, revealing clothing, 
-        horror, ugly faces, distorted faces, extra limbs, deformed, blurry, low quality, amateur art
+        nsfw, cleavage, nudity, cropped faces, cut-off bodies, low-res, religious symbols, crosses, halos, 
+        horror, gore, distortion, church, priest, saint, biblical, mandala, abstract patterns only, blurry, low quality
         """
         
-        # Use SDXL v1 API with proper dimensions
+        # Try Stability AI v2beta with enhanced parameters
+        try:
+            response = requests.post(
+                "https://api.stability.ai/v2beta/stable-image/generate/core",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Accept": "application/json"
+                },
+                files={
+                    "prompt": (None, prompt),
+                    "negative_prompt": (None, negative_prompt),
+                    "aspect_ratio": (None, "16:9"),
+                    "style_preset": (None, "comic_ink"),
+                    "output_format": (None, "base64"),
+                    "cfg_scale": (None, "8")
+                },
+                timeout=120
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "image" in data:
+                    logging.info(f"Successfully generated Core v2beta image for panel {panel.panel}, base64 length: {len(data['image'])}")
+                    return data['image']
+                else:
+                    logging.warning(f"Core v2beta no image data returned for panel {panel.panel}")
+            else:
+                logging.warning(f"Core v2beta failed: {response.status_code}, falling back to SDXL")
+        
+        except Exception as e:
+            logging.warning(f"Core v2beta error: {e}, falling back to SDXL")
+        
+        # Fallback to SDXL v1 API with 16:9 aspect ratio
         response = requests.post(
             "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
             headers={
@@ -328,9 +356,9 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                     {"text": prompt, "weight": 1.0},
                     {"text": negative_prompt, "weight": -1.0}
                 ],
-                "cfg_scale": 12,
-                "height": 1152,
-                "width": 896,  # Valid SDXL dimensions - 896x1152 landscape format for comic panels
+                "cfg_scale": 8,
+                "height": 576,  # 16:9 aspect ratio
+                "width": 1024,
                 "steps": 30,
                 "samples": 1,
                 "sampler": "K_DPM_2_ANCESTRAL"
