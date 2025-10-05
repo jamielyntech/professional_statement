@@ -284,9 +284,11 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         """
         
         negative_prompt = """
-        nsfw, naked, sexy, suggestive, breasts, cleavage, butt, legs, lingerie, fetish, violence, horror, gore, 
+        nsfw, naked, nude, sexy, suggestive, breasts, cleavage, butt, buttocks, legs, thighs, lingerie, fetish, violence, horror, gore,
         low quality, distorted faces, cartoon, anime, abstract, blurry, cropped faces, partial bodies, revealing clothing,
-        sexual poses, inappropriate clothing, tight clothing, short skirts, tank tops, swimwear
+        sexual poses, inappropriate clothing, tight clothing, short skirts, tank tops, swimwear, bikini, underwear, bra,
+        exposed skin, bare shoulders, bare back, décolletage, provocative, seductive, alluring, erotic, adult content,
+        body parts, anatomy, flesh, skin exposure, revealing necklines, low cut, short dress, mini skirt, crop top
         """
         
         # Enhanced API parameters for better quality and composition
