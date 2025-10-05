@@ -499,7 +499,7 @@ async def root():
 
 @api_router.get("/test-image")
 async def test_image_generation():
-    """Test endpoint for image generation with enhanced placeholders"""
+    """Test endpoint for image generation"""
     # Create a test panel
     test_panel = ComicPanel(
         panel=1,
@@ -509,13 +509,39 @@ async def test_image_generation():
         mood="Mystical and wondrous"
     )
     
-    # Test complete pipeline (will use enhanced placeholder due to insufficient credits)
+    # Test complete pipeline
     try:
+        # First test Stability AI directly
+        stability_result = generate_stability_ai_image(test_panel, "Mystical Watercolor")
+        if stability_result:
+            return {
+                "success": True, 
+                "method": "stability_ai", 
+                "image_size": len(stability_result), 
+                "has_image": True, 
+                "note": "Successfully generated real AI image using Stability AI"
+            }
+        
+        # Fall back to complete pipeline if direct fails
         image_base64 = await generate_panel_image(test_panel, "Mystical Watercolor")
         if image_base64:
-            return {"success": True, "method": "enhanced_placeholder", "image_size": len(image_base64), "has_image": True, "note": "Using enhanced placeholder due to Stability AI credit shortage"}
+            # Check if it's a real AI image or placeholder by size
+            if len(image_base64) > 1000000:  # Real images are typically larger
+                method = "stability_ai_via_pipeline"
+                note = "Successfully generated real AI image via pipeline"
+            else:
+                method = "enhanced_placeholder"
+                note = "Using enhanced placeholder - Stability AI may have failed"
+            
+            return {
+                "success": True, 
+                "method": method, 
+                "image_size": len(image_base64), 
+                "has_image": True, 
+                "note": note
+            }
         else:
-            return {"success": False, "error": "Image generation pipeline failed"}
+            return {"success": False, "error": "Image generation pipeline failed completely"}
     except Exception as e:
         return {"success": False, "error": f"Image generation test failed: {str(e)}"}
 
