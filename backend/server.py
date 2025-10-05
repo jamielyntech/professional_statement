@@ -328,10 +328,10 @@ def compress_image_for_storage(image_base64: str, max_size_mb: float = 1.5) -> s
         image = Image.open(BytesIO(image_bytes))
         
         # Start with high quality and reduce if needed
-        quality = 85
+        quality = 90  # Start higher for better quality
         max_size_bytes = max_size_mb * 1024 * 1024
         
-        while quality > 20:
+        while quality > 30:  # Don't go too low on quality
             # Convert to bytes with current quality
             output_buffer = BytesIO()
             image.save(output_buffer, format='JPEG', quality=quality, optimize=True)
@@ -343,7 +343,7 @@ def compress_image_for_storage(image_base64: str, max_size_mb: float = 1.5) -> s
                 logging.info(f"Compressed image from {len(image_bytes)} to {len(compressed_bytes)} bytes at quality {quality}")
                 return compressed_base64
             
-            quality -= 10
+            quality -= 5  # Smaller quality reduction steps
         
         # If still too large, resize image and try again
         logging.warning("Image still too large after quality compression, resizing...")
