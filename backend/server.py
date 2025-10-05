@@ -106,6 +106,34 @@ def get_llm_chat():
 def get_image_generator():
     return OpenAIImageGeneration(api_key=os.environ['EMERGENT_LLM_KEY'])
 
+async def generate_image_direct_openai(prompt: str):
+    """Fallback image generation using direct OpenAI API"""
+    try:
+        client = openai.AsyncOpenAI(api_key=os.environ['EMERGENT_LLM_KEY'])
+        
+        response = await client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
+        
+        # Download the image
+        image_url = response.data[0].url
+        async with aiohttp.ClientSession() as session:
+            async with session.get(image_url) as resp:
+                if resp.status == 200:
+                    image_bytes = await resp.read()
+                    return image_bytes
+                else:
+                    logging.error(f"Failed to download image from {image_url}")
+                    return None
+                    
+    except Exception as e:
+        logging.error(f"Direct OpenAI image generation failed: {e}")
+        return None
+
 # Helper functions
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image for a comic panel"""
