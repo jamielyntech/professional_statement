@@ -238,6 +238,18 @@ frontend:
         agent: "main"
         comment: "RESOLVED: Frontend displaying real AI images. Latest comic 'Test Real AI Images' has 5 panels with real compressed AI artwork saved successfully."
 
+  - task: "Traditional Speech Bubbles Implementation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/EnhancedComicViewer.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "INVESTIGATING: Current speech bubble CSS (.comic-speech-overlay) exists but user reports never seeing speech bubbles. Need to verify implementation and make them more prominent and traditional comic-style. Current overlays may not be displaying correctly or visibly enough."
+
 metadata:
   created_by: "main_agent"
   version: "2.0"
