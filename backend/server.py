@@ -228,9 +228,23 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
                     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
                     return image_base64
                 else:
+                    # Final fallback to placeholder image
+                    logging.info(f"Using placeholder image for panel {panel.panel}")
+                    placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
+                    if placeholder_bytes:
+                        image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
+                        return image_base64
                     return None
             except Exception as fallback_error:
-                logging.error(f"All image generation failed for panel {panel.panel}: {fallback_error}")
+                logging.error(f"Direct OpenAI failed for panel {panel.panel}, using placeholder: {fallback_error}")
+                # Final fallback to placeholder image
+                try:
+                    placeholder_bytes = await generate_placeholder_image(prompt, panel.panel)
+                    if placeholder_bytes:
+                        image_base64 = base64.b64encode(placeholder_bytes).decode('utf-8')
+                        return image_base64
+                except Exception as placeholder_error:
+                    logging.error(f"Even placeholder generation failed for panel {panel.panel}: {placeholder_error}")
                 return None
         
         if images and len(images) > 0:
