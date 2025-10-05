@@ -230,15 +230,16 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         
         if response.status_code == 200:
             data = response.json()
-            if not data.get("image"):
-                logging.error(f"No image returned from Stability AI for panel {panel.panel}: {data}")
+            # V1 API response format
+            if "artifacts" in data and len(data["artifacts"]) > 0:
+                image_base64 = data["artifacts"][0]["base64"]
+                logging.info(f"Successfully generated Stability AI image for panel {panel.panel} using v1 API, base64 length: {len(image_base64)}")
+                return image_base64
+            else:
+                logging.error(f"No artifacts in Stability AI v1 response for panel {panel.panel}: {data}")
                 return None
-            
-            image_base64 = data["image"]
-            logging.info(f"Successfully generated Stability AI image for panel {panel.panel}, base64 length: {len(image_base64)}")
-            return image_base64
         else:
-            logging.error(f"Stability AI API error for panel {panel.panel}: {response.status_code} - {response.text}")
+            logging.error(f"Stability AI v1 API error for panel {panel.panel}: {response.status_code} - {response.text}")
             return None
             
     except Exception as e:
