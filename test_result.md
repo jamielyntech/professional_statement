@@ -264,7 +264,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Comic Layout System Backend Support"
+    - "Traditional Speech Bubbles Frontend Implementation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
