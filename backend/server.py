@@ -353,9 +353,9 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                     }))
                 }
                 
-                # Use the correct img2img transform endpoint
+                # Use Stability AI v1 img2img endpoint (more reliable)
                 response = requests.post(
-                    "https://api.stability.ai/v2beta/stable-image/transform",
+                    "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image",
                     headers={
                         "Authorization": f"Bearer {api_key}",
                         "Accept": "application/json"
