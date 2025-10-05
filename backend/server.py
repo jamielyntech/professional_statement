@@ -157,7 +157,7 @@ async def generate_enhanced_comic_placeholder(prompt: str, panel_number: int, st
         
         # Draw central mystical scene area
         scene_area = [50, 100, width-50, height-200]
-        draw.rectangle(scene_area, fill='rgba(255,255,255,0.8)', outline='#20b69e', width=3)
+        draw.rectangle(scene_area, fill='#ffffff', outline='#20b69e', width=3)
         
         try:
             font = ImageFont.load_default()
