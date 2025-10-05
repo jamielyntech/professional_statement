@@ -256,28 +256,25 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             logging.error("STABILITY_API_KEY not found")
             return None
             
-        # Build character descriptions for the prompt
-        character_details = ""
-        if jamie_desc and "jamie" in panel.scene.lower():
-            character_details += f"Jamie: {jamie_desc}. "
-        if kylee_desc and "kylee" in panel.scene.lower():
-            character_details += f"Kylee: {kylee_desc}. "
-        
-        # If no specific character descriptions, use generic ones
-        if not character_details and ("jamie" in panel.scene.lower() or "kylee" in panel.scene.lower()):
-            character_details = "Jamie: young adventurous girl with curious bright eyes and shoulder-length hair. Kylee: wise companion with flowing hair and gentle mystical aura. "
-        
-        # Create enhanced detailed prompt
+        # Enhanced mystical scene prompt with brand guidelines
         prompt = f"""
-        {panel.scene}
-        {character_details}
-        Style: {style} with ethereal watercolor effects, soft magical lighting, dreamy atmosphere.
-        Color palette: mystical magenta #e74285, enchanted teal #20b69e, golden magic #fcd94c, deep navy #1a1330.
-        High quality digital art, cinematic composition, detailed character features, magical glow effects.
-        Avoid: cartoon style, low quality, blurry, distorted faces.
+        {panel.scene}.
+        Include Jamie and Kylee as the main characters in {style} style.
+        Setting: mystical, sacred, candle-lit, tarot table, astrology charts, moonlight, feathers, gold ink.
+        Tone: soulful, feminine, spiritual, cinematic but modest.
+        Characters: Fully clothed in flowing, elegant, mystical clothing. Respectful poses, hands visible, modest necklines.
+        Avoid cleavage, nudity, sexual poses, or revealing clothing.
+        Use Mystical Whispers palette (magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330).
+        Soft watercolor lighting, ethereal glow, gentle emotion, portrait composition showing faces clearly.
         """
         
-        # Enhanced API parameters for better quality
+        negative_prompt = """
+        nsfw, naked, sexy, suggestive, breasts, cleavage, butt, legs, lingerie, fetish, violence, horror, gore, 
+        low quality, distorted faces, cartoon, anime, abstract, blurry, cropped faces, partial bodies, revealing clothing,
+        sexual poses, inappropriate clothing, tight clothing, short skirts, tank tops, swimwear
+        """
+        
+        # Enhanced API parameters for better quality and composition
         response = requests.post(
             "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
             headers={
@@ -288,16 +285,16 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             json={
                 "text_prompts": [
                     {"text": prompt, "weight": 1.0},
-                    {"text": "low quality, blurry, distorted, cartoon, anime, abstract", "weight": -0.5}
+                    {"text": negative_prompt, "weight": -1.0}
                 ],
-                "cfg_scale": 12,  # Higher for better prompt adherence
-                "height": 1024,
-                "width": 1024,
-                "steps": 30,  # More steps for better quality
+                "cfg_scale": 15,  # Higher for better prompt adherence
+                "height": 832,  # Better aspect ratio for comic panels
+                "width": 1216,  # Landscape for better panel composition
+                "steps": 35,  # More steps for better quality
                 "samples": 1,
-                "sampler": "K_DPM_2_ANCESTRAL"  # Better sampler for artistic styles
+                "sampler": "K_DPM_2_ANCESTRAL"
             },
-            timeout=90  # Longer timeout for better quality
+            timeout=120
         )
         
         if response.status_code == 200:
