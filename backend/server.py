@@ -319,13 +319,12 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                     "Authorization": f"Bearer {api_key}",
                     "Accept": "application/json"
                 },
-                files={
-                    "prompt": (None, prompt),
-                    "negative_prompt": (None, negative_prompt),
-                    "aspect_ratio": (None, "16:9"),
-                    "style_preset": (None, "comic_ink"),
-                    "output_format": (None, "base64"),
-                    "cfg_scale": (None, "8")
+                data={
+                    "prompt": prompt,
+                    "negative_prompt": negative_prompt,
+                    "aspect_ratio": "16:9",
+                    "style_preset": "comic_ink",
+                    "output_format": "base64"
                 },
                 timeout=120
             )
@@ -338,7 +337,7 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
                 else:
                     logging.warning(f"Core v2beta no image data returned for panel {panel.panel}")
             else:
-                logging.warning(f"Core v2beta failed: {response.status_code}, falling back to SDXL")
+                logging.warning(f"Core v2beta failed: {response.status_code} - {response.text}, falling back to SDXL")
         
         except Exception as e:
             logging.warning(f"Core v2beta error: {e}, falling back to SDXL")
