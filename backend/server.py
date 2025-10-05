@@ -125,20 +125,24 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         Add watercolor glow effects and magical atmosphere.
         Comic book illustration style, detailed and vibrant."""
         
-        # Generate image with simpler call
+        # Generate image with proper parameters
         try:
             images = await image_gen.generate_images(
                 prompt=prompt,
-                number_of_images=1
+                model="gpt-image-1",
+                number_of_images=1,
+                quality="standard"
             )
         except Exception as img_error:
-            logging.warning(f"Image generation failed for panel {panel.panel}, trying with dall-e-3: {img_error}")
-            # Fallback to dall-e-3
-            images = await image_gen.generate_images(
-                prompt=prompt,
-                model="dall-e-3",
-                number_of_images=1
-            )
+            logging.warning(f"Image generation failed for panel {panel.panel}, trying simplified call: {img_error}")
+            # Fallback with minimal parameters
+            try:
+                images = await image_gen.generate_images(
+                    prompt=prompt
+                )
+            except Exception as fallback_error:
+                logging.error(f"All image generation failed for panel {panel.panel}: {fallback_error}")
+                return None
         
         if images and len(images) > 0:
             # Convert to base64
