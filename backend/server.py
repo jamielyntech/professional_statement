@@ -439,28 +439,24 @@ async def root():
 @api_router.get("/test-image")
 async def test_image_generation():
     """Test endpoint for image generation"""
-    simple_prompt = "A simple cartoon drawing of a magical crystal glowing in a forest"
+    # Create a test panel
+    test_panel = ComicPanel(
+        panel=1,
+        scene="A magical crystal glowing in an enchanted forest with Jamie and Kylee standing nearby in wonder",
+        dialogue="Look at that beautiful crystal!",
+        character_actions="Jamie points excitedly while Kylee stares in amazement",
+        mood="Mystical and wondrous"
+    )
     
-    # Try direct OpenAI first
+    # Test Stability AI
     try:
-        image_bytes = await generate_image_direct_openai(simple_prompt)
-        if image_bytes:
-            return {"success": True, "method": "direct_openai", "image_size": len(image_bytes), "has_image": True}
-    except Exception as e:
-        logging.error(f"Direct OpenAI test failed: {e}")
-    
-    # Fallback to emergentintegrations
-    try:
-        image_gen = get_image_generator()
-        images = await image_gen.generate_images(prompt=simple_prompt)
-        
-        if images and len(images) > 0:
-            return {"success": True, "method": "emergentintegrations", "image_size": len(images[0]), "has_image": True}
+        image_base64 = generate_stability_ai_image(test_panel, "Mystical Watercolor")
+        if image_base64:
+            return {"success": True, "method": "stability_ai", "image_size": len(image_base64), "has_image": True}
         else:
-            return {"success": False, "error": "No images generated from emergentintegrations"}
-            
+            return {"success": False, "error": "Stability AI returned no image"}
     except Exception as e:
-        return {"success": False, "error": f"Both methods failed. Direct OpenAI and emergentintegrations: {str(e)}"}
+        return {"success": False, "error": f"Stability AI test failed: {str(e)}"}
 
 @api_router.post("/upload-character")
 async def upload_character(name: str, file: UploadFile = File(...)):
