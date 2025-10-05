@@ -760,7 +760,7 @@ async def test_image_generation():
         # First test Stability AI directly with enhanced character descriptions
         jamie_test_desc = "spiritual guide with beautiful facial features, wearing modest mystical robes, hands holding crystals"
         kylee_test_desc = "gentle mystical companion with soft features, flowing hair, surrounded by spiritual light"
-        stability_result = generate_stability_ai_image(test_panel, "Mystical Watercolor", jamie_test_desc, kylee_test_desc)
+        stability_result = generate_stability_ai_image_text_only(test_panel, "Mystical Watercolor", jamie_test_desc, kylee_test_desc)
         if stability_result:
             return {
                 "success": True, 
