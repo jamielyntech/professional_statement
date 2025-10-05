@@ -83,8 +83,11 @@ function App() {
         {/* Main Content */}
         {!currentComic ? (
           <div>
-            {/* Story Input */}
-            <StoryInput 
+            {/* Character Upload */}
+            <CharacterUpload />
+            
+            {/* Enhanced Story Input */}
+            <EnhancedStoryInput 
               onSubmit={handleStorySubmit} 
               isLoading={isLoading} 
             />
