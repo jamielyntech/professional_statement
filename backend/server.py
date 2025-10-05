@@ -346,9 +346,8 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                     "cfg_scale": "8",
                     "image_strength": "0.4",  # 0.4 = 60% original image influence
                     "samples": "1",
-                    "steps": "30",
-                    "height": "768",
-                    "width": "1344"
+                    "steps": "30"
+                    # Note: height/width not allowed in img2img - uses init_image dimensions
                 }
                 
                 files = {
