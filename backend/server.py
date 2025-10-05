@@ -209,18 +209,17 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
         Soft watercolor glow, cinematic tone.
         """
         
-        # Use JSON format as shown in user's debugging code
+        # Use multipart form-data but request JSON response with base64 output
         response = requests.post(
             "https://api.stability.ai/v2beta/stable-image/generate/sd3",
             headers={
                 "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
+                "Accept": "application/json"
             },
-            json={
-                "prompt": prompt,
-                "output_format": "base64",
-                "aspect_ratio": "4:5"
+            files={
+                "prompt": (None, prompt),
+                "aspect_ratio": (None, "4:5"),
+                "output_format": (None, "base64")
             },
             timeout=60
         )
