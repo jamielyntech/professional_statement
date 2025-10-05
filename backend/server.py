@@ -635,13 +635,13 @@ async def upload_character(name: str, file: UploadFile = File(...)):
         # Convert to base64
         image_base64 = base64.b64encode(contents).decode('utf-8')
         
-        # Create enhanced character description based on name and uploaded image
+        # Create enhanced character description based on name and uploaded image - focused on face and spiritual energy
         if name.lower() == 'jamie':
-            description = "Jamie: Young adventurous girl with curious bright eyes, shoulder-length hair, wearing casual adventuring clothes, confident expression, brave and determined look"
+            description = "Jamie: Spiritual guide with beautiful facial features, expressive eyes full of wisdom, elegant flowing hair, wearing modest mystical robes or flowing dresses, serene and confident expression, hands often holding crystals or tarot cards"
         elif name.lower() == 'kylee':
-            description = "Kylee: Wise young companion with gentle features, flowing hair, mystical aura, kind and thoughtful expression, magical energy surrounding her"
+            description = "Kylee: Gentle mystical companion with soft facial features, flowing hair with ethereal quality, wearing elegant modest clothing, kind and intuitive expression, surrounded by soft spiritual light and sacred energy"
         else:
-            description = f"Character reference for {name}: Mystical young person with unique features and adventurous spirit"
+            description = f"Character reference for {name}: Mystical spiritual person with sacred energy and modest elegant appearance"
         
         # Save character reference
         character = CharacterReference(
