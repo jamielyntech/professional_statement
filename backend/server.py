@@ -366,8 +366,8 @@ def compress_image_for_storage(image_base64: str, max_size_mb: float = 1.5) -> s
 async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
     """Generate an AI image for a comic panel using Stability AI"""
     try:
-        # Try Stability AI first
-        image_base64 = generate_stability_ai_image(panel, style)
+        # Try Stability AI first with character descriptions
+        image_base64 = generate_stability_ai_image(panel, style, jamie_desc, kylee_desc)
         if image_base64:
             # Compress the image for storage to avoid MongoDB document size limits
             compressed_image = compress_image_for_storage(image_base64, max_size_mb=1.5)
