@@ -9,7 +9,7 @@ import base64
 from PIL import Image
 from io import BytesIO
 
-BACKEND_URL = "https://whisper-comics.preview.emergentagent.com/api"
+BACKEND_URL = "https://wealth-comics.preview.emergentagent.com/api"
 
 def test_image_dimensions():
     """Test that images now have correct 896x1152 dimensions"""

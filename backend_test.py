@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://whisper-comics.preview.emergentagent.com/api"
+BACKEND_URL = "https://wealth-comics.preview.emergentagent.com/api"
 TEST_TIMEOUT = 60
 
 def log_test(test_name, status, details=""):

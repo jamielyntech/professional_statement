@@ -14,7 +14,7 @@ from PIL import Image
 from io import BytesIO
 
 # Configuration
-BACKEND_URL = "https://whisper-comics.preview.emergentagent.com/api"
+BACKEND_URL = "https://wealth-comics.preview.emergentagent.com/api"
 TEST_TIMEOUT = 120
 
 def log_test(test_name, status, details=""):
