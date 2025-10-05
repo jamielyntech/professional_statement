@@ -353,7 +353,24 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                     }))
                 }
                 
-                # Use Stability AI v1 img2img endpoint (more reliable)
+                # Use correct Stability AI v1 img2img endpoint  
+                data = {
+                    "text_prompts": [
+                        {"text": prompt, "weight": 1.0},
+                        {"text": negative_prompt, "weight": -1.0}
+                    ],
+                    "cfg_scale": 8,
+                    "image_strength": 0.4,  # 0.4 = 60% original image influence
+                    "samples": 1,
+                    "steps": 30,
+                    "height": 768,
+                    "width": 1344
+                }
+                
+                files = {
+                    "init_image": ("reference.png", BytesIO(image_bytes), "image/png")
+                }
+                
                 response = requests.post(
                     "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image",
                     headers={
@@ -361,6 +378,7 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                         "Accept": "application/json"
                     },
                     files=files,
+                    data=data,
                     timeout=120
                 )
                 
