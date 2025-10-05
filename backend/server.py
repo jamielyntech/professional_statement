@@ -12,12 +12,14 @@ import uuid
 from datetime import datetime
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+import openai
 import json
 import base64
 import io
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
+import aiohttp
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
