@@ -194,6 +194,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "VERIFIED: Enhanced image parameters working correctly. CFG scale 15, steps 35, landscape format 832x1216 producing high-quality 2.2MB+ images. Image compression reducing to 200-400KB for MongoDB storage while maintaining quality. Enhanced parameters resulting in better composition and detail."
+      - working: true
+        agent: "testing"
+        comment: "COMIC LAYOUT SYSTEM VERIFIED: Fixed image dimensions to correct 896x1152 landscape format. All 5/5 comic layout tests passed: ✅ Image Dimensions (896x1152), ✅ Speech Bubble Data Structure, ✅ Saved Comics Storage (45 comics), ✅ Panel Layout Structure, ✅ Image Compression for 400px containers. Backend generating properly sized images with good compression (200-300KB each)."
+
+  - task: "Comic Layout System Backend Support"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE COMIC LAYOUT TESTING COMPLETED: Created comic_layout_test.py and executed full test suite. ALL 5/5 TESTS PASSED: ✅ Image Dimensions (896x1152 landscape format), ✅ Speech Bubble Data Structure (dialogue and actions for overlays), ✅ Saved Comics Storage (45 comics with 35 having images), ✅ Comic Panel Layout Structure (complete panel data), ✅ Image Compression (200-300KB optimized for 400px containers). Fixed dimension bug in backend (height/width swap). Backend fully supports enhanced comic layout system."
 
 frontend:
   - task: "Display Real AI Images"
