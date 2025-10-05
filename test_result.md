@@ -210,6 +210,18 @@ backend:
         agent: "testing"
         comment: "COMPREHENSIVE COMIC LAYOUT TESTING COMPLETED: Created comic_layout_test.py and executed full test suite. ALL 5/5 TESTS PASSED: ✅ Image Dimensions (896x1152 landscape format), ✅ Speech Bubble Data Structure (dialogue and actions for overlays), ✅ Saved Comics Storage (45 comics with 35 having images), ✅ Comic Panel Layout Structure (complete panel data), ✅ Image Compression (200-300KB optimized for 400px containers). Fixed dimension bug in backend (height/width swap). Backend fully supports enhanced comic layout system."
 
+  - task: "Stability AI Image-to-Image Integration"
+    implemented: false
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "IMPLEMENTING: Researched Stability AI v2beta img2img API. Need to modify generate_stability_ai_image function to use uploaded character photos as reference images with multipart form data. Target image strength 0.7-0.8 for character likeness while allowing scene variation."
+
 frontend:
   - task: "Display Real AI Images"
     implemented: true
