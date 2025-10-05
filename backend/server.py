@@ -374,7 +374,9 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                     else:
                         logging.warning(f"img2img transform no artifacts returned for panel {panel.panel}")
                 else:
-                    logging.warning(f"img2img transform failed: {response.status_code} - {response.text}, falling back to text-only")
+                    logging.error(f"img2img failed: {response.status_code} - {response.text}")
+                    logging.error(f"img2img request files keys: {list(files.keys())}")
+                    logging.warning("Falling back to text-only generation")
             
             except Exception as e:
                 logging.warning(f"img2img error: {e}, falling back to text-only generation")
