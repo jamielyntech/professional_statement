@@ -213,25 +213,23 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             "https://api.stability.ai/v2beta/stable-image/generate/sd3",
             headers={
                 "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json"
+                "Accept": "image/png",
+                "Content-Type": "application/json"
             },
-            files={
-                "prompt": (None, prompt),
-                "output_format": (None, "png"),
-                "aspect_ratio": (None, "4:5")
+            json={
+                "prompt": prompt,
+                "aspect_ratio": "4:5",
+                "output_format": "png"
             },
             timeout=60
         )
         
         if response.status_code == 200:
-            data = response.json()
-            image_base64 = data.get("image")
-            if image_base64:
-                logging.info(f"Successfully generated Stability AI image for panel {panel.panel}")
-                return image_base64
-            else:
-                logging.error(f"No image data in Stability AI response for panel {panel.panel}")
-                return None
+            # Convert raw binary image data to Base64
+            image_bytes = response.content
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            logging.info(f"Successfully generated Stability AI image for panel {panel.panel}, size: {len(image_bytes)} bytes")
+            return image_base64
         else:
             logging.error(f"Stability AI API error for panel {panel.panel}: {response.status_code} - {response.text}")
             return None
