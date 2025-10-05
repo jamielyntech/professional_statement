@@ -530,16 +530,26 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         reference_photo = None
         panel_text = (panel.scene + " " + (panel.dialogue or "") + " " + (panel.character_actions or "")).lower()
         
-        if jamie_photo and ("jamie" in panel_text):
-            reference_photo = jamie_photo
-            logging.info(f"Using Jamie photo for img2img reference in panel {panel.panel}")
-        elif kylee_photo and ("kylee" in panel_text):
+        # Count character mentions to choose the primary character
+        jamie_mentions = panel_text.count("jamie")
+        kylee_mentions = panel_text.count("kylee")
+        
+        logging.info(f"Panel {panel.panel} - Jamie mentions: {jamie_mentions}, Kylee mentions: {kylee_mentions}")
+        
+        if kylee_mentions > jamie_mentions and kylee_photo:
             reference_photo = kylee_photo
             logging.info(f"Using Kylee photo for img2img reference in panel {panel.panel}")
-        elif jamie_photo and kylee_photo:
-            # If both characters mentioned or unclear, use Jamie as default
+        elif jamie_mentions > 0 and jamie_photo:
             reference_photo = jamie_photo
-            logging.info(f"Using Jamie photo as default reference for panel {panel.panel}")
+            logging.info(f"Using Jamie photo for img2img reference in panel {panel.panel}")
+        elif kylee_photo and jamie_mentions == 0:
+            reference_photo = kylee_photo
+            logging info(f"Using Kylee photo (no Jamie mentions) for panel {panel.panel}")
+        elif jamie_photo:
+            reference_photo = jamie_photo
+            logging.info(f"Using Jamie photo as fallback for panel {panel.panel}")
+        else:
+            logging.info(f"No character photos available for panel {panel.panel}")
         
         # Try Stability AI with img2img if reference photo available, otherwise text-only
         if reference_photo:
