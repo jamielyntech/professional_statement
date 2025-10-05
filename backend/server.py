@@ -295,15 +295,15 @@ def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Waterc
             logging.error("STABILITY_API_KEY not found")
             return None
         
-        # Enhanced comic panel prompt with character references
+        # Enhanced comic panel prompt with detailed character references
         prompt = f"""
-        Comic panel of Jamie and Kylee — two women standing side by side, confident and kind. 
-        Scene: {panel.scene}
-        Jamie: long dark hair, wavy style, teal clothing, tech-mystic energy. 
-        Kylee: golden-blonde hair, layered cut, warm clothing, intuitive presence.
-        Include full heads and shoulders, clean comic outlines, watercolor ink finish, teal and magenta palette, no cropping. 
-        Add speech bubbles with dialogue placeholders. Traditional comic book style with clean lineart.
-        Colors: magenta #e74285, teal #20b69e, gold #fcd94c, navy #1a1330.
+        Comic panel: {panel.scene}
+        Jamie: Woman with long dark silver-gray hair (like in uploaded reference photo), confident facial features, wearing teal/mystical colors, tech-savvy energy.
+        Kylee: Woman with blonde curly hair (like in uploaded reference photo), bright blue eyes, warm smile, wearing earth tones, intuitive presence.
+        Both women should resemble their uploaded reference photos as closely as possible.
+        Include full heads and upper bodies, no cropping of faces. Traditional comic book art style with clean outlines.
+        Watercolor ink finish with mystical color palette: magenta #e74285, teal #20b69e, gold #fcd94c.
+        Professional comic book composition showing complete characters.
         """
         
         negative_prompt = """
