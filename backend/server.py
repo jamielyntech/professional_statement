@@ -544,7 +544,7 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
             logging.info(f"Using Jamie photo for img2img reference in panel {panel.panel}")
         elif kylee_photo and jamie_mentions == 0:
             reference_photo = kylee_photo
-            logging info(f"Using Kylee photo (no Jamie mentions) for panel {panel.panel}")
+            logging.info(f"Using Kylee photo (no Jamie mentions) for panel {panel.panel}")
         elif jamie_photo:
             reference_photo = jamie_photo
             logging.info(f"Using Jamie photo as fallback for panel {panel.panel}")
