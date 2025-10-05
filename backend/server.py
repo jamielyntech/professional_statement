@@ -355,7 +355,7 @@ async def get_characters():
     try:
         characters = await db.characters.find().to_list(100)
         return [CharacterReference(**char) for char in characters]
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Failed to fetch characters")
 
 @api_router.post("/parse-story", response_model=StoryboardResponse)
