@@ -279,24 +279,26 @@ h3, .panel-title {
   z-index: 199 !important;
 }
 
-/* Action text overlay */
+/* Traditional Comic Narration Box */
 .comic-action-overlay {
   position: absolute !important;
-  top: 15px !important;
-  left: 15px !important;
-  right: 15px !important;
-  background: #fcd94c !important;
-  border: 2px solid #1a1330 !important;
-  border-radius: 12px !important;
-  padding: 8px 12px !important;
-  font-family: 'Fredoka One', sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #1a1330 !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3) !important;
-  z-index: 90 !important;
-  max-width: calc(100% - 30px) !important;
+  top: 20px !important;
+  left: 20px !important;
+  right: 20px !important;
+  background: #ffeb3b !important;
+  border: 3px solid #000000 !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-family: 'Comic Neue', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+  z-index: 190 !important;
+  max-width: calc(100% - 40px) !important;
   word-wrap: break-word !important;
+  text-align: center !important;
+  font-style: italic !important;
 }
 
 /* Character Upload Styles */
