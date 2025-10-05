@@ -366,13 +366,15 @@ async def generate_stability_ai_image_with_reference(panel: ComicPanel, characte
                 
                 if response.status_code == 200:
                     data = response.json()
-                    if "image" in data:
-                        logging.info(f"Successfully generated img2img image for panel {panel.panel}, base64 length: {len(data['image'])}")
-                        return data['image']
+                    # v2beta transform API returns artifacts array like v1
+                    if "artifacts" in data and len(data["artifacts"]) > 0:
+                        image_base64 = data["artifacts"][0]["base64"]
+                        logging.info(f"Successfully generated img2img transform image for panel {panel.panel}, base64 length: {len(image_base64)}")
+                        return image_base64
                     else:
-                        logging.warning(f"img2img no image data returned for panel {panel.panel}")
+                        logging.warning(f"img2img transform no artifacts returned for panel {panel.panel}")
                 else:
-                    logging.warning(f"img2img failed: {response.status_code} - {response.text}, falling back to text-only")
+                    logging.warning(f"img2img transform failed: {response.status_code} - {response.text}, falling back to text-only")
             
             except Exception as e:
                 logging.warning(f"img2img error: {e}, falling back to text-only generation")
