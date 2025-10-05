@@ -1,34 +1,259 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Override default fonts with mystical comic fonts */
+body {
+  font-family: 'Comic Neue', 'Bangers', sans-serif;
+  background: linear-gradient(135deg, #ffeaf5 0%, #f0fff7 100%);
+  color: #1a1330;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Comic Panels */
+.comic-panel {
+  border: 3px solid #e74285;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 6px 15px rgba(231, 66, 133, 0.2);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.comic-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(231, 66, 133, 0.3);
 }
 
-.App-link {
-    color: #61dafb;
+/* Speech Bubbles */
+.speech-bubble {
+  background: linear-gradient(135deg, #20b69e, #3ba9f5);
+  color: #fff;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  position: relative;
+  max-width: 70%;
+  margin: 0.5rem 0;
+  font-family: 'Comic Neue', sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #20b69e transparent;
+}
+
+.speech-bubble.right {
+  margin-left: auto;
+  background: linear-gradient(135deg, #e74285, #ff7a32);
+}
+
+.speech-bubble.right::after {
+  left: auto;
+  right: 20px;
+  border-color: #e74285 transparent;
+}
+
+/* Narration Boxes */
+.narration {
+  background: #fcd94c;
+  color: #1a1330;
+  font-family: 'Fredoka One', sans-serif;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid #1a1330;
+  box-shadow: 3px 3px 0px #1a1330;
+}
+
+/* Title Styling */
+h1, .comic-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.5rem;
+  color: #e74285;
+  text-shadow: 2px 2px #ff7a32;
+  letter-spacing: 1px;
+}
+
+h2, .comic-subtitle {
+  font-family: 'Bangers', cursive;
+  font-size: 1.8rem;
+  color: #20b69e;
+  text-shadow: 1px 1px #1a1330;
+}
+
+h3, .panel-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  color: #1a1330;
+  margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+.comic-button {
+  background: linear-gradient(135deg, #e74285, #ff7a32);
+  color: white;
+  border: 3px solid #1a1330;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-family: 'Fredoka One', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 3px 3px 0px #1a1330;
+}
+
+.comic-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #1a1330;
+}
+
+.comic-button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #1a1330;
+}
+
+.comic-button.secondary {
+  background: linear-gradient(135deg, #20b69e, #3ba9f5);
+}
+
+/* Input Fields */
+.comic-input {
+  border: 3px solid #e74285;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  font-family: 'Comic Neue', sans-serif;
+  font-size: 1rem;
+  background: white;
+  color: #1a1330;
+  transition: border-color 0.3s ease;
+}
+
+.comic-input:focus {
+  outline: none;
+  border-color: #20b69e;
+  box-shadow: 0 0 0 2px rgba(32, 182, 158, 0.2);
+}
+
+.comic-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Loading Animation */
+.comic-loading {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e74285;
+  border-radius: 50%;
+  border-top-color: #ff7a32;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Panel Grid */
+.panels-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.panel-item {
+  background: white;
+  border: 3px solid #1a1330;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 5px 5px 0px #1a1330;
+  transition: transform 0.3s ease;
+}
+
+.panel-item:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px #1a1330;
+}
+
+.panel-number {
+  background: #e74285;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bangers', cursive;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  border: 2px solid #1a1330;
+}
+
+/* Badge override */
+#emergent-badge {
+  background: linear-gradient(90deg, #e74285, #20b69e) !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  border-radius: 999px !important;
+}
+
+/* Character Tags */
+.character-tag {
+  background: #3ba9f5;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-family: 'Comic Neue', sans-serif;
+  font-weight: bold;
+  display: inline-block;
+  margin: 0.2rem;
+  border: 2px solid #1a1330;
+}
+
+.character-tag.jamie {
+  background: #e74285;
+}
+
+.character-tag.kylee {
+  background: #20b69e;
+}
+
+/* Mystical Background Elements */
+.mystical-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.mystical-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(231, 66, 133, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(32, 182, 158, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(252, 217, 76, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1, .comic-title {
+    font-size: 2rem;
+  }
+  
+  .speech-bubble {
+    max-width: 90%;
+  }
+  
+  .comic-panel {
+    padding: 0.75rem;
+  }
 }
