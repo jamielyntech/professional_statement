@@ -176,7 +176,6 @@ def create_speech_bubble(draw, text, x, y, max_width=200, font=None):
     # Calculate bubble size
     line_height = 20
     padding = 15
-    bubble_width = max_width + padding * 2
     bubble_height = len(lines) * line_height + padding * 2
     
     # Draw bubble background (white with black border)
