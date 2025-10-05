@@ -106,6 +106,62 @@ def get_llm_chat():
 def get_image_generator():
     return OpenAIImageGeneration(api_key=os.environ['EMERGENT_LLM_KEY'])
 
+async def generate_placeholder_image(prompt: str, panel_number: int):
+    """Generate a placeholder comic panel image for demonstration"""
+    try:
+        # Create a 512x512 placeholder image
+        width, height = 512, 512
+        image = Image.new('RGB', (width, height), color='#f0fff7')
+        draw = ImageDraw.Draw(image)
+        
+        # Draw mystical gradient background
+        for y in range(height):
+            ratio = y / height
+            r = int(255 - ratio * 30)
+            g = int(240 + ratio * 15) 
+            b = int(247 - ratio * 20)
+            for x in range(width):
+                image.putpixel((x, y), (r, g, b))
+        
+        draw = ImageDraw.Draw(image)
+        
+        # Draw mystical border
+        border_color = '#e74285'
+        for i in range(5):
+            draw.rectangle([i, i, width-1-i, height-1-i], outline=border_color)
+        
+        # Draw panel number
+        try:
+            font = ImageFont.load_default()
+        except:
+            font = None
+            
+        if font:
+            # Panel number badge
+            badge_size = 40
+            draw.ellipse([20, 20, 20 + badge_size, 20 + badge_size], fill='#e74285', outline='#1a1330', width=3)
+            draw.text((20 + badge_size//2, 20 + badge_size//2), str(panel_number), fill='white', font=font, anchor='mm')
+            
+            # Add scene text
+            scene_text = f"Panel {panel_number}: Mystical Scene"
+            draw.text((width//2, height//2 - 40), scene_text, fill='#1a1330', font=font, anchor='mm')
+            
+            # Add prompt preview (truncated)
+            prompt_preview = prompt[:50] + "..." if len(prompt) > 50 else prompt
+            draw.text((width//2, height//2), prompt_preview, fill='#666', font=font, anchor='mm')
+            
+            # Add mystical elements
+            draw.text((width//2, height//2 + 40), "✨ Mystical Comic Panel ✨", fill='#20b69e', font=font, anchor='mm')
+        
+        # Convert to bytes
+        img_byte_arr = io.BytesIO()
+        image.save(img_byte_arr, format='PNG')
+        return img_byte_arr.getvalue()
+        
+    except Exception as e:
+        logging.error(f"Placeholder image generation failed: {e}")
+        return None
+
 async def generate_image_direct_openai(prompt: str):
     """Fallback image generation using direct OpenAI API"""
     try:
