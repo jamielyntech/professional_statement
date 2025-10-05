@@ -307,7 +307,77 @@ async def get_character_photos():
         logging.error(f"Error retrieving character photos: {e}")
         return None, None
 
-def generate_stability_ai_image(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
+async def generate_stability_ai_image_with_reference(panel: ComicPanel, character_photo: str = None, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
+    """Generate an AI image using Stability AI img2img with character photo reference"""
+    try:
+        api_key = os.getenv("STABILITY_API_KEY")
+        if not api_key:
+            logging.error("STABILITY_API_KEY not found")
+            return None
+        
+        # Enhanced comic panel prompt with detailed character references
+        prompt = f"""
+        Comic panel: {panel.scene}
+        Jamie: Woman with long dark silver-gray hair, confident facial features, wearing teal/mystical colors, tech-savvy energy.
+        Kylee: Woman with blonde curly hair, bright blue eyes, warm smile, wearing earth tones, intuitive presence.
+        Use the reference photo for character likeness. Traditional comic book art style with clean outlines.
+        Watercolor ink finish with mystical color palette: magenta #e74285, teal #20b69e, gold #fcd94c.
+        Professional comic book composition showing complete characters.
+        """
+        
+        negative_prompt = """
+        nsfw, cleavage, nudity, cropped faces, cut-off bodies, low-res, religious symbols, crosses, halos, 
+        horror, gore, distortion, church, priest, saint, biblical, mandala, abstract patterns only, blurry, low quality
+        """
+        
+        if character_photo:
+            # Use img2img with reference photo
+            try:
+                # Decode base64 image and prepare for multipart upload
+                image_bytes = base64.b64decode(character_photo)
+                
+                files = {
+                    "image": ("reference.png", BytesIO(image_bytes), "image/png"),
+                    "prompt": (None, prompt),
+                    "negative_prompt": (None, negative_prompt),
+                    "strength": (None, "0.75"),  # 0.7-0.8 range for character likeness
+                    "aspect_ratio": (None, "16:9"),
+                    "style_preset": (None, "comic-book"),
+                    "output_format": (None, "png")
+                }
+                
+                response = requests.post(
+                    "https://api.stability.ai/v2beta/stable-image/generate/core",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Accept": "application/json"
+                    },
+                    files=files,
+                    timeout=120
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if "image" in data:
+                        logging.info(f"Successfully generated img2img image for panel {panel.panel}, base64 length: {len(data['image'])}")
+                        return data['image']
+                    else:
+                        logging.warning(f"img2img no image data returned for panel {panel.panel}")
+                else:
+                    logging.warning(f"img2img failed: {response.status_code} - {response.text}, falling back to text-only")
+            
+            except Exception as e:
+                logging.warning(f"img2img error: {e}, falling back to text-only generation")
+        
+        # Fallback to text-only generation (existing logic)
+        return await generate_stability_ai_image_text_only(panel, style, jamie_desc, kylee_desc)
+            
+    except Exception as e:
+        logging.error(f"Error generating Stability AI image for panel {panel.panel}: {str(e)}")
+        return None
+
+def generate_stability_ai_image_text_only(panel: ComicPanel, style: str = "Mystical Watercolor", jamie_desc: str = "", kylee_desc: str = ""):
+    """Generate an AI image using Stability AI text-to-image (original function)"""
     """Generate an AI image using Stability AI DreamShaper XL with character references"""
     try:
         api_key = os.getenv("STABILITY_API_KEY")
