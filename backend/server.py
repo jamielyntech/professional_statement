@@ -21,6 +21,7 @@ from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
 import aiohttp
+from io import BytesIO
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
