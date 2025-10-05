@@ -325,6 +325,26 @@ def create_comic_composite(panels: List[ComicPanel], title: str, aspect_ratio: s
 async def root():
     return {"message": "Welcome to Mystical Whispers Comics API!"}
 
+@api_router.get("/test-image")
+async def test_image_generation():
+    """Test endpoint for image generation"""
+    try:
+        image_gen = get_image_generator()
+        simple_prompt = "A simple cartoon drawing of a magical crystal glowing in a forest"
+        
+        images = await image_gen.generate_images(
+            prompt=simple_prompt
+        )
+        
+        if images and len(images) > 0:
+            image_base64 = base64.b64encode(images[0]).decode('utf-8')
+            return {"success": True, "image_size": len(images[0]), "has_image": True}
+        else:
+            return {"success": False, "error": "No images generated"}
+            
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 @api_router.post("/upload-character")
 async def upload_character(name: str, file: UploadFile = File(...)):
     """Upload a character reference image"""
