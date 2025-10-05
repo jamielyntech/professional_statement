@@ -151,100 +151,171 @@ async def generate_panel_image(panel: ComicPanel, style: str = "Mystical Waterco
         logging.error(f"Error generating image for panel {panel.panel}: {str(e)}")
         return None
 
-def create_comic_composite(panels: List[ComicPanel], title: str, aspect_ratio: str = "4:5"):
-    """Create a composite image of all comic panels"""
-    try:
-        # Calculate dimensions based on aspect ratio
-        if aspect_ratio == "4:5":
-            width, height = 800, 1000
-        elif aspect_ratio == "16:9":
-            width, height = 1200, 675
+def create_speech_bubble(draw, text, x, y, max_width=200, font=None):
+    """Create a speech bubble with text"""
+    if not font:
+        font = ImageFont.load_default()
+    
+    # Wrap text
+    words = text.split()
+    lines = []
+    current_line = []
+    
+    for word in words:
+        test_line = ' '.join(current_line + [word])
+        bbox = draw.textbbox((0, 0), test_line, font=font)
+        if bbox[2] <= max_width and len(current_line) > 0:
+            current_line.append(word)
         else:
-            width, height = 800, 1000
+            if current_line:
+                lines.append(' '.join(current_line))
+            current_line = [word]
+    if current_line:
+        lines.append(' '.join(current_line))
+    
+    # Calculate bubble size
+    line_height = 20
+    padding = 15
+    bubble_width = max_width + padding * 2
+    bubble_height = len(lines) * line_height + padding * 2
+    
+    # Draw bubble background (white with black border)
+    bubble_rect = (x - padding, y - padding, x + max_width + padding, y + len(lines) * line_height + padding)
+    draw.ellipse(bubble_rect, fill='white', outline='black', width=3)
+    
+    # Draw tail
+    tail_points = [(x + max_width//2, y + bubble_height - padding), 
+                   (x + max_width//2 - 15, y + bubble_height + 10),
+                   (x + max_width//2 + 5, y + bubble_height - padding)]
+    draw.polygon(tail_points, fill='white', outline='black')
+    
+    # Draw text
+    for i, line in enumerate(lines):
+        draw.text((x, y + i * line_height), line, fill='black', font=font)
+    
+    return bubble_height + 15
+
+def create_comic_strip(panels: List[ComicPanel], title: str, aspect_ratio: str = "4:5"):
+    """Create a professional comic strip with speech bubbles and proper layouts"""
+    try:
+        # Social media optimized dimensions
+        if aspect_ratio == "4:5":  # Instagram post
+            width, height = 1080, 1350
+        elif aspect_ratio == "16:9":  # Twitter/landscape
+            width, height = 1200, 675
+        elif aspect_ratio == "9:16":  # Instagram story
+            width, height = 1080, 1920
+        else:
+            width, height = 1080, 1350
         
-        # Create blank canvas
-        composite = Image.new('RGB', (width, height), color='#ffeaf5')
+        # Create main canvas with mystical gradient
+        composite = Image.new('RGB', (width, height))
+        
+        # Create gradient background
+        for y in range(height):
+            ratio = y / height
+            r = int(255 * (1 - ratio * 0.1))
+            g = int(234 + ratio * 20)
+            b = int(245 + ratio * 10)
+            for x in range(width):
+                composite.putpixel((x, y), (r, g, b))
+        
         draw = ImageDraw.Draw(composite)
         
-        # Title area
-        title_height = 100
+        # Load fonts
         try:
-            # Use default font if custom font fails
-            font = ImageFont.load_default()
+            title_font = ImageFont.load_default()
+            text_font = ImageFont.load_default() 
         except:
-            font = None
+            title_font = None
+            text_font = None
         
-        # Draw title
-        if font:
-            draw.text((width//2, 30), title, fill='#e74285', font=font, anchor='mt')
+        # Title area
+        title_height = 80
+        if title_font:
+            # Title background
+            draw.rectangle([20, 10, width-20, title_height], fill='#e74285', outline='#1a1330', width=3)
+            draw.text((width//2, title_height//2), title, fill='white', font=title_font, anchor='mm')
         
-        # Calculate panel layout
-        panels_per_row = 2 if len(panels) > 3 else 1
-        panel_width = (width - 60) // panels_per_row
-        panel_height = (height - title_height - 60) // ((len(panels) + panels_per_row - 1) // panels_per_row)
+        # Calculate panel layout for vertical comic strip
+        available_height = height - title_height - 40
+        panel_height = available_height // len(panels)
+        panel_width = width - 40
         
-        # Place panels
+        # Create panels
         for i, panel in enumerate(panels):
-            row = i // panels_per_row
-            col = i % panels_per_row
+            panel_y = title_height + 20 + i * panel_height
             
-            x = 30 + col * (panel_width + 20)
-            y = title_height + 30 + row * (panel_height + 20)
+            # Panel border with mystical styling
+            panel_rect = [20, panel_y, width-20, panel_y + panel_height - 10]
+            draw.rectangle(panel_rect, fill='white', outline='#e74285', width=4)
             
-            # Create panel background
-            panel_bg = Image.new('RGB', (panel_width-20, panel_height-20), color='white')
-            panel_draw = ImageDraw.Draw(panel_bg)
+            # Panel number badge
+            badge_size = 30
+            badge_x = 30
+            badge_y = panel_y + 10
+            draw.ellipse([badge_x, badge_y, badge_x + badge_size, badge_y + badge_size], 
+                        fill='#e74285', outline='#1a1330', width=2)
+            if text_font:
+                draw.text((badge_x + badge_size//2, badge_y + badge_size//2), 
+                         str(panel.panel), fill='white', font=text_font, anchor='mm')
             
-            # Draw panel border
-            panel_draw.rectangle([0, 0, panel_width-21, panel_height-21], outline='#e74285', width=3)
-            
-            # Add panel image if available
+            # Add AI generated panel image if available
+            image_area_height = panel_height - 80  # Leave space for text
             if panel.image_base64:
                 try:
                     panel_image_data = base64.b64decode(panel.image_base64)
                     panel_image = Image.open(io.BytesIO(panel_image_data))
                     
-                    # Resize to fit panel
-                    panel_image = panel_image.resize((panel_width-40, panel_height-100))
-                    panel_bg.paste(panel_image, (10, 10))
+                    # Resize to fit panel while maintaining aspect ratio
+                    img_width = panel_width - 60
+                    img_height = image_area_height - 20
+                    panel_image.thumbnail((img_width, img_height), Image.Resampling.LANCZOS)
+                    
+                    # Center the image
+                    img_x = 40 + (img_width - panel_image.width) // 2
+                    img_y = panel_y + 40
+                    
+                    composite.paste(panel_image, (img_x, img_y))
+                    
+                    # Add speech bubble if dialogue exists
+                    if panel.dialogue and text_font:
+                        bubble_x = img_x + 20
+                        bubble_y = img_y + panel_image.height - 60
+                        create_speech_bubble(draw, panel.dialogue, bubble_x, bubble_y, 
+                                           min(300, panel_image.width - 40), text_font)
+                
                 except Exception as e:
                     logging.error(f"Error adding panel image: {e}")
-            
-            # Add panel number
-            if font:
-                panel_draw.text((15, panel_height-50), f"Panel {panel.panel}", fill='#1a1330', font=font)
-            
-            # Add dialogue if exists
-            if panel.dialogue and font:
-                # Simple text wrapping
-                words = panel.dialogue.split()
-                lines = []
-                current_line = []
-                for word in words:
-                    if len(' '.join(current_line + [word])) < 30:
-                        current_line.append(word)
-                    else:
-                        lines.append(' '.join(current_line))
-                        current_line = [word]
-                if current_line:
-                    lines.append(' '.join(current_line))
+                    # Fallback: just add text
+                    if panel.dialogue and text_font:
+                        draw.text((40, panel_y + 50), panel.dialogue, fill='#1a1330', font=text_font)
+            else:
+                # No image: create text-based panel
+                if panel.scene and text_font:
+                    scene_text = f"Scene: {panel.scene}"
+                    draw.text((40, panel_y + 40), scene_text[:100] + "...", fill='#1a1330', font=text_font)
                 
-                for j, line in enumerate(lines[:3]):  # Max 3 lines
-                    panel_draw.text((15, panel_height-40+j*15), line, fill='#1a1330', font=font)
-            
-            # Paste panel onto composite
-            composite.paste(panel_bg, (x, y))
+                if panel.dialogue and text_font:
+                    bubble_x = 40
+                    bubble_y = panel_y + 80
+                    create_speech_bubble(draw, panel.dialogue, bubble_x, bubble_y, 
+                                       panel_width - 100, text_font)
         
         # Convert to bytes
         img_byte_arr = io.BytesIO()
-        composite.save(img_byte_arr, format='PNG')
+        composite.save(img_byte_arr, format='PNG', quality=95)
         img_byte_arr = img_byte_arr.getvalue()
         
         return base64.b64encode(img_byte_arr).decode('utf-8')
         
     except Exception as e:
-        logging.error(f"Error creating composite: {e}")
+        logging.error(f"Error creating comic strip: {e}")
         return None
+
+def create_comic_composite(panels: List[ComicPanel], title: str, aspect_ratio: str = "4:5"):
+    """Create a composite comic strip - now uses the enhanced comic strip generator"""
+    return create_comic_strip(panels, title, aspect_ratio)
 
 # Routes
 @api_router.get("/")
